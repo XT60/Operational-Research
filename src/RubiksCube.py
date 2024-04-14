@@ -221,6 +221,119 @@ class RubiksCube:
             self.cube['L'][0, :] = temp_right
             self.cube['B'][0, :] = temp_front
             self.cube['R'][0, :] = temp_left
+        elif face == "x":
+            self.display()
+            self.cube["R"] = np.rot90(self.cube["R"], k=-1)
+            self.cube["L"] = np.rot90(self.cube["L"])
+            temp_front = np.copy(self.cube['F'])
+            temp_up = np.copy(self.cube['U'])
+            temp_down = np.copy(self.cube['D'])
+            temp_back = np.copy(self.cube['B'])
+
+            self.cube['F'] = temp_down
+            self.cube['U'] = temp_front
+            self.cube['D'] = np.rot90(temp_back, k=2)
+            self.cube['B'] = np.rot90(temp_up, k=2)
+            self.display()
+        elif face == "x'":
+            self.display()
+            self.cube["R"] = np.rot90(self.cube["R"])
+            self.cube["L"] = np.rot90(self.cube["L"], k=-1)
+            temp_front = np.copy(self.cube['F'])
+            temp_up = np.copy(self.cube['U'])
+            temp_down = np.copy(self.cube['D'])
+            temp_back = np.copy(self.cube['B'])
+
+            self.cube['F'] = temp_up
+            self.cube['U'] = np.rot90(temp_back, k=2)
+            self.cube['D'] = temp_front
+            self.cube['B'] = np.rot90(temp_down, k=2)
+            self.display()
+        elif face == "x2":
+            self.cube["R"] = np.rot90(self.cube["R"], k=2)
+            self.cube["L"] = np.rot90(self.cube["L"], k=2)
+            temp_front = np.copy(self.cube['F'])
+            temp_up = np.copy(self.cube['U'])
+            temp_down = np.copy(self.cube['D'])
+            temp_back = np.copy(self.cube['B'])
+
+            self.cube['F'] = np.rot90(temp_back, k=2)
+            self.cube['U'] = temp_down
+            self.cube['D'] = temp_up
+            self.cube['B'] = np.rot90(temp_front, k=2)
+        elif face == "y":
+            self.cube["U"] = np.rot90(self.cube["U"], k=-1)
+            self.cube["D"] = np.rot90(self.cube["D"])
+            temp_front = np.copy(self.cube['F'])
+            temp_left = np.copy(self.cube['L'])
+            temp_back = np.copy(self.cube['B'])
+            temp_right = np.copy(self.cube['R'])
+
+            self.cube['F'] = temp_right
+            self.cube['L'] = temp_front
+            self.cube['B'] = temp_left
+            self.cube['R'] = temp_back
+        elif face == "y'":
+            self.cube["U"] = np.rot90(self.cube["U"])
+            self.cube["D"] = np.rot90(self.cube["D"], k=-1)
+            temp_front = np.copy(self.cube['F'])
+            temp_left = np.copy(self.cube['L'])
+            temp_back = np.copy(self.cube['B'])
+            temp_right = np.copy(self.cube['R'])
+
+            self.cube['F'] = temp_left
+            self.cube['L'] = temp_back
+            self.cube['B'] = temp_right
+            self.cube['R'] = temp_front
+        elif face == "y2":
+            self.cube["U"] = np.rot90(self.cube["U"], k=2)
+            self.cube["D"] = np.rot90(self.cube["D"], k=2)
+            temp_front = np.copy(self.cube['F'])
+            temp_left = np.copy(self.cube['L'])
+            temp_back = np.copy(self.cube['B'])
+            temp_right = np.copy(self.cube['R'])
+
+            self.cube['F'] = temp_back
+            self.cube['L'] = temp_right
+            self.cube['B'] = temp_front
+            self.cube['R'] = temp_left
+        elif face == "z":
+            self.cube["F"] = np.rot90(self.cube["F"], k=-1)
+            self.cube["B"] = np.rot90(self.cube["B"])
+            temp_top = np.copy(self.cube['U'])
+            temp_bottom = np.copy(self.cube['D'])
+            temp_left = np.copy(self.cube['L'])
+            temp_right = np.copy(self.cube['R'])
+
+            self.cube['U'] = np.rot90(temp_left, k=-1)
+            self.cube['D'] = np.rot90(temp_right, k=-1)
+            self.cube['L'] = np.rot90(temp_bottom, k=-1)
+            self.cube['R'] = np.rot90(temp_top, k=-1)
+        elif face == "z'":
+            self.cube["F"] = np.rot90(self.cube["F"])
+            self.cube["B"] = np.rot90(self.cube["B"], k=-1)
+            temp_top = np.copy(self.cube['U'])
+            temp_bottom = np.copy(self.cube['D'])
+            temp_left = np.copy(self.cube['L'])
+            temp_right = np.copy(self.cube['R'])
+
+            self.cube['U'] = np.rot90(temp_right)
+            self.cube['D'] = np.rot90(temp_left)
+            self.cube['L'] = np.rot90(temp_top)
+            self.cube['R'] = np.rot90(temp_bottom)
+        elif face == "z2":
+            self.cube["F"] = np.rot90(self.cube["F"], k=2)
+            self.cube["B"] = np.rot90(self.cube["B"], k=2)
+            # Temporarily store the edges
+            temp_top = np.copy(self.cube['U'])
+            temp_bottom = np.copy(self.cube['D'])
+            temp_left = np.copy(self.cube['L'])
+            temp_right = np.copy(self.cube['R'])
+
+            self.cube['U'] = np.rot90(temp_bottom, k=2)
+            self.cube['D'] = np.rot90(temp_top, k=2)
+            self.cube['L'] = np.rot90(temp_right, k=2)
+            self.cube['R'] = np.rot90(temp_left, k=2)
 
     def display(self):
         blank_face = np.full((3, 3), ' ')

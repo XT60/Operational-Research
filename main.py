@@ -241,6 +241,7 @@ def main():
     i = 1
     current_move_index = 0
     temp_alg = "F L F U' R U F2 L2 U' L' B D' B' L2 U"
+    temp_alg = "U' F2 R' L' U' B R2 D B U' R2 L B2 D' B2 U F2 B2 U' L2 B2 L2"
     moves = temp_alg.split(" ")
     # moves = []
     while not glfw.window_should_close(window):
