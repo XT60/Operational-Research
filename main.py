@@ -253,6 +253,7 @@ def main():
         glMatrixMode(GL_MODELVIEW)
         glLoadIdentity()
         gluLookAt(2, 1, 3, 0, 0, 0, 0, 1, 0)
+        print(cube.get_score())
 
         # Apply scene rotation
         glRotatef(scene_rotation[0], 1, 0, 0)  # Rotation around X-axis

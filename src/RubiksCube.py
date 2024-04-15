@@ -1,7 +1,6 @@
 import numpy as np
 
 
-
 class RubiksCube:
     def __init__(self):
         self.cube = {
@@ -334,6 +333,16 @@ class RubiksCube:
             self.cube['D'] = np.rot90(temp_top, k=2)
             self.cube['L'] = np.rot90(temp_right, k=2)
             self.cube['R'] = np.rot90(temp_left, k=2)
+
+    def get_score(self):
+        score = 0
+        for face in self.cube:
+            center = self.cube[face][1, 1]
+            for row in self.cube[face]:
+                for cell in row:
+                    if cell != center:
+                        score += 1
+        return score
 
     def display(self):
         blank_face = np.full((3, 3), ' ')
