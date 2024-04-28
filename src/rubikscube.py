@@ -43,6 +43,10 @@ class RubiksCube:
         new_cube.cube = copy.deepcopy(self.cube)
         new_cube.move_history = copy.deepcopy(self.move_history)
         return new_cube
+    def update(self, other):
+        self.scramble = other.scramble
+        self.cube = copy.deepcopy(other.cube)
+        self.move_history = copy.deepcopy(other.move_history)
 
     def rotate_face(self, face):
         if face == "F":

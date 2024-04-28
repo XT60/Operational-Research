@@ -3,6 +3,8 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from .rubikscube import RubiksCube
 from .solver import BeesAlgorithm
+import threading
+
 
 
 class Drawer:
@@ -169,6 +171,13 @@ class Drawer:
             else:
                 self.cube.rotate_face('z')
 
+    def run_solver(self, solver, i, solved_cube, lock, stop_event):
+        while not stop_event.is_set():
+            new_cube = solver.solve(i).copy()
+            with lock:
+                solved_cube.update(new_cube)
+            print(solved_cube.get_score())
+            i += 1
     def run(self):
         if not glfw.init():
             return
@@ -195,23 +204,27 @@ class Drawer:
         moves = temp_alg.split(" ")
         moves = []
         solved_cube = RubiksCube("B' D2 L' F' B2 U2 D  F2 R' U' D2 L2 F L2 B F2 R D L D' F2 L2 B' L' R'")
-
+        solved_cube.make_alg("scramble")
+        lock = threading.Lock()
+        stop_event = threading.Event()
         solver = BeesAlgorithm(solved_cube, 200, 200, 30, 200)
+        solver_thread = threading.Thread(target=self.run_solver, args=(solver, 0, solved_cube, lock, stop_event))
+        solver_thread.start()
         while not glfw.window_should_close(window):
 
-            if i == 1:
-                solved_cube.make_alg("scramble")
 
             # if i % 100 == 0 and (current_move_index < len(moves) or 1):
             #     # self.cube.rotate_face(moves[current_move_index])
             #     # current_move_index += 1
             #     self.cube.make_alg("random_scramble")
-            if i % 10 == 0 and (current_move_index < len(moves) or 1):
-                # self.cube.rotate_face(moves[current_move_index])
-                # current_move_index += 1
-                solved_cube = solver.solve(i//10).copy()
-                print(solved_cube.get_score())
-            i += 1
+            # if i % 10 == 0 and (current_move_index < len(moves) or 1):
+            #     # self.cube.rotate_face(moves[current_move_index])
+            #     # current_move_index += 1
+            #     solved_cube = solver.solve(i//10).copy()
+            #     print(solved_cube.get_score())
+            # i += 1
+            with lock:
+                current_cube = solved_cube.copy()
             # self.cube.make_alg("Aa")
 
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -224,12 +237,12 @@ class Drawer:
             glRotatef(self.scene_rotation[1], 0, 1, 0)
             glScalef(self.scene_scale, self.scene_scale, self.scene_scale)
 
-            self.draw_cube_face(solved_cube.cube['U'], 'U')
-            self.draw_cube_face(solved_cube.cube['L'], 'L')
-            self.draw_cube_face(solved_cube.cube['F'], 'F')
-            self.draw_cube_face(solved_cube.cube['R'], 'R')
-            self.draw_cube_face(solved_cube.cube['B'], 'B')
-            self.draw_cube_face(solved_cube.cube['D'], 'D')
+            self.draw_cube_face(current_cube.cube['U'], 'U')
+            self.draw_cube_face(current_cube.cube['L'], 'L')
+            self.draw_cube_face(current_cube.cube['F'], 'F')
+            self.draw_cube_face(current_cube.cube['R'], 'R')
+            self.draw_cube_face(current_cube.cube['B'], 'B')
+            self.draw_cube_face(current_cube.cube['D'], 'D')
 
             glfw.swap_buffers(window)
             glfw.poll_events()

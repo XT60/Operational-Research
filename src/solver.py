@@ -21,6 +21,7 @@ class BeesAlgorithm:
         for _ in range(self.num_local_searches):
             candidate = cube.copy()
             candidate.make_alg("random_algs", move_count=random.randint(1, 5))
+            candidate.make_alg("random_moves", move_count=random.randint(0, 2))
             candidate_fitness = candidate.get_score()
             if candidate_fitness < best_fitness:
                 best = candidate.copy()
