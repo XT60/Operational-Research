@@ -2,6 +2,7 @@ import glfw
 from OpenGL.GL import *
 from OpenGL.GLU import *
 from .rubikscube import RubiksCube
+from .solver import BeesAlgorithm
 
 
 class Drawer:
@@ -193,28 +194,42 @@ class Drawer:
         temp_alg = "U' F2 R' L' U' B R2 D B U' R2 L B2 D' B2 U F2 B2 U' L2 B2 L2"
         moves = temp_alg.split(" ")
         moves = []
+        solved_cube = RubiksCube("B' D2 L' F' B2 U2 D  F2 R' U' D2 L2 F L2 B F2 R D L D' F2 L2 B' L' R'")
+
+        solver = BeesAlgorithm(solved_cube, 200, 200, 30, 200)
         while not glfw.window_should_close(window):
-            if i % 100 == 0 and current_move_index < len(moves):
-                self.cube.rotate_face(moves[current_move_index])
-                current_move_index += 1
+
+            if i == 1:
+                solved_cube.make_alg("scramble")
+
+            # if i % 100 == 0 and (current_move_index < len(moves) or 1):
+            #     # self.cube.rotate_face(moves[current_move_index])
+            #     # current_move_index += 1
+            #     self.cube.make_alg("random_scramble")
+            if i % 10 == 0 and (current_move_index < len(moves) or 1):
+                # self.cube.rotate_face(moves[current_move_index])
+                # current_move_index += 1
+                solved_cube = solver.solve(i//10).copy()
+                print(solved_cube.get_score())
             i += 1
-            self.cube.make_alg("Aa")
+            # self.cube.make_alg("Aa")
+
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
             glMatrixMode(GL_MODELVIEW)
             glLoadIdentity()
             gluLookAt(2, 1, 3, 0, 0, 0, 0, 1, 0)
-            print(self.cube.get_score())
+            # print(self.cube.get_score())
 
             glRotatef(self.scene_rotation[0], 1, 0, 0)
             glRotatef(self.scene_rotation[1], 0, 1, 0)
             glScalef(self.scene_scale, self.scene_scale, self.scene_scale)
 
-            self.draw_cube_face(self.cube.cube['U'], 'U')
-            self.draw_cube_face(self.cube.cube['L'], 'L')
-            self.draw_cube_face(self.cube.cube['F'], 'F')
-            self.draw_cube_face(self.cube.cube['R'], 'R')
-            self.draw_cube_face(self.cube.cube['B'], 'B')
-            self.draw_cube_face(self.cube.cube['D'], 'D')
+            self.draw_cube_face(solved_cube.cube['U'], 'U')
+            self.draw_cube_face(solved_cube.cube['L'], 'L')
+            self.draw_cube_face(solved_cube.cube['F'], 'F')
+            self.draw_cube_face(solved_cube.cube['R'], 'R')
+            self.draw_cube_face(solved_cube.cube['B'], 'B')
+            self.draw_cube_face(solved_cube.cube['D'], 'D')
 
             glfw.swap_buffers(window)
             glfw.poll_events()
