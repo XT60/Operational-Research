@@ -192,12 +192,13 @@ class Drawer:
         temp_alg = "F L F U' R U F2 L2 U' L' B D' B' L2 U"
         temp_alg = "U' F2 R' L' U' B R2 D B U' R2 L B2 D' B2 U F2 B2 U' L2 B2 L2"
         moves = temp_alg.split(" ")
-        # moves = []
+        moves = []
         while not glfw.window_should_close(window):
             if i % 100 == 0 and current_move_index < len(moves):
                 self.cube.rotate_face(moves[current_move_index])
                 current_move_index += 1
             i += 1
+            self.cube.make_alg("Aa")
             glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
             glMatrixMode(GL_MODELVIEW)
             glLoadIdentity()

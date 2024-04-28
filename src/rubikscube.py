@@ -334,6 +334,13 @@ class RubiksCube:
             self.cube['L'] = np.rot90(temp_right, k=2)
             self.cube['R'] = np.rot90(temp_left, k=2)
 
+    def make_alg(self, alg_name, alg=""):
+        if alg_name == "Aa":
+            alg_str = "x z' R2 U2 R' D' R U2 R' D R' z x'"
+            moves = alg_str.split(" ")
+            for i in range(len(moves)):
+                self.rotate_face(moves[i])
+
     def get_score(self):
         score = 0
         for face in self.cube:
