@@ -36,8 +36,8 @@ class BeesAlgorithm:
                 new_cube = self.best_cube.copy()
             else:
                 new_cube = self.cube.copy()
-            # new_cube.make_alg("random_moves", move_count=20)
-            new_cube.make_alg("random_algs", move_count=30)
+            new_cube.make_alg("random_moves", move_count=30)
+            # new_cube.make_alg("random_algs", move_count=30)
             new_population.append(new_cube)
         return new_population
 

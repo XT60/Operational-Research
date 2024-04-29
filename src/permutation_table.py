@@ -44,9 +44,8 @@ moves_xyz = ['x', 'y', 'z', '']
 directions = ['', "'", '2']
 
 viable_moves = [move + direction for move in moves for direction in directions]
-viable_moves_xyz = [move + direction for move in moves_xyz for direction in directions]
+n = 3
+pp = [' '.join(perm).strip() for perm in list(itertools.permutations(moves_xyz, n)) + list(itertools.permutations(moves_xyz, 1))]
+viable_moves_xyz = [move + direction for move in pp for direction in directions]
 
 perms_all = [xyz + p for xyz in viable_moves_xyz for p in perms]
-n = 3
-pp = list(itertools.permutations(moves_xyz, n))
-perms_all + [' '.join(perm).strip() for perm in pp]

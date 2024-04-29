@@ -424,10 +424,10 @@ class RubiksCube:
         score = 0
         for face in self.cube:
             center = self.cube[face][1, 1]
-            for row in self.cube[face]:
-                for cell in row:
-                    if cell != center:
-                        score += 1
+            # for row in self.cube[face]:
+            #     for cell in row:
+            #         if cell != center:
+            #             score += 1
             adjacent = self.adjacencies[face]
             adjacent_edges = adjacent["edges"]
             adjacent_corners = adjacent["corners"]
