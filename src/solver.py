@@ -75,7 +75,7 @@ class BeesAlgorithm:
             self.population = [self.local_search(cube) for cube in tqdm.tqdm(self.population, desc="local_search")]
             self.population.extend(self.global_search())
             self.population.sort(key=lambda x: x.get_score())
-            self.best_cubes = self.population[:len(self.population)//5]
+            # self.best_cubes = self.population[:len(self.population)//5]
             self.population = self.population[:len(self.population) // 2]  # Keep the best half
             for cube in self.population:
                 if cube.get_score() == 0:
