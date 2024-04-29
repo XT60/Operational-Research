@@ -6,7 +6,7 @@ from .rubikscube import RubiksCube
 class BeesAlgorithm:
     def __init__(self, cube, initial_population_size, num_scouts, num_local_searches, max_iterations):
 
-        self.best_cube = cube
+        self.best_cubes = [cube]
         self.cube = cube
         self.cube.make_alg("scramble")
         self.population = [cube.copy() for _ in range(initial_population_size)]
@@ -30,10 +30,15 @@ class BeesAlgorithm:
 
     def global_search(self):
         new_population = []
+        j = 0
         for i in range(self.num_scouts):
 
             if i % 3 == 0:
-                new_cube = self.best_cube.copy()
+                if j >= len(self.best_cubes):
+                    new_cube = self.cube.copy()
+                else:
+                    new_cube = self.best_cubes[int(j)].copy()
+                    j += 0.5
             else:
                 new_cube = self.cube.copy()
             new_cube.make_alg("random_moves", move_count=30)
@@ -48,26 +53,26 @@ class BeesAlgorithm:
                 self.population = [self.local_search(cube) for cube in self.population]
                 self.population.extend(self.global_search())
                 self.population.sort(key=lambda x: x.get_score())
-                self.population = self.population[:(len(self.population)) // 2]  # Keep the best half
+                self.population = self.population[:(len(self.population)*3) // 4]
 
                 for cube in self.population:
                     if cube.get_score() == 0:
                         print("Solved!")
                         print(cube.move_history)
-                        return self.population[0]
+                        return True, self.population[0]
         else:
-            print(iter_num)
+            print(f"Iteration: {iter_num}")
             if iter_num > self.max_iterations:
                 print("Above Limit")
-                return self.population[0]
+                return False, self.population[0]
             self.population = [self.local_search(cube) for cube in self.population]
             self.population.extend(self.global_search())
             self.population.sort(key=lambda x: x.get_score())
-            self.best_cube = self.population[0]
+            self.best_cubes = self.population[:len(self.population)//5]
             self.population = self.population[:len(self.population) // 2]  # Keep the best half
             for cube in self.population:
                 if cube.get_score() == 0:
                     print("Solved!")
                     print(cube.move_history)
-                    return cube
-            return self.population[0]
+                    return True, cube
+            return False, self.population[0]

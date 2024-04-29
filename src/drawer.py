@@ -171,12 +171,28 @@ class Drawer:
             else:
                 self.cube.rotate_face('z')
 
+    def window_resize_callback(self, window, width, height):
+        # Update the viewport to match the new window dimensions
+        glViewport(0, 0, width, height)
+        # Update the projection matrix
+        glMatrixMode(GL_PROJECTION)
+        glLoadIdentity()
+        # Adjust the perspective to maintain aspect ratio
+        aspect_ratio = width / float(height) if height else 1.0
+        gluPerspective(45, aspect_ratio, 0.1, 50.0)
+        glMatrixMode(GL_MODELVIEW)
+
     def run_solver(self, solver, i, solved_cube, lock, stop_event):
-        while not stop_event.is_set():
-            new_cube = solver.solve(i).copy()
+        print(f"Score: {solved_cube.get_score()}")
+        is_solved = False
+        while not stop_event.is_set() and not is_solved:
+
+            is_solved, new_cube = solver.solve(i)
+            new_cube = new_cube.copy()
             with lock:
                 solved_cube.update(new_cube)
-            print(solved_cube.get_score())
+            print(f"Score: {solved_cube.get_score()} {solved_cube.move_history}")
+
             i += 1
     def run(self):
         if not glfw.init():
@@ -188,6 +204,8 @@ class Drawer:
             return
 
         glfw.make_context_current(window)
+        glfw.set_window_size_callback(window, self.window_resize_callback)
+
         glEnable(GL_DEPTH_TEST)
         glMatrixMode(GL_PROJECTION)
         gluPerspective(45, 640 / 480, 0.1, 50.0)
@@ -204,10 +222,10 @@ class Drawer:
         moves = temp_alg.split(" ")
         moves = []
         solved_cube = RubiksCube("B' D2 L' F' B2 U2 D  F2 R' U' D2 L2 F L2 B F2 R D L D' F2 L2 B' L' R'")
-        solved_cube.make_alg("scramble")
+        # solved_cube.make_alg("scramble")
         lock = threading.Lock()
         stop_event = threading.Event()
-        solver = BeesAlgorithm(solved_cube, 200, 100, 75, 200)
+        solver = BeesAlgorithm(solved_cube, 300, 200, 100, 200)
         solver_thread = threading.Thread(target=self.run_solver, args=(solver, 0, solved_cube, lock, stop_event))
         solver_thread.start()
         while not glfw.window_should_close(window):
