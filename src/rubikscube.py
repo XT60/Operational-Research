@@ -390,14 +390,15 @@ class RubiksCube:
                 moves = random_value.split(" ")
                 for i in range(len(moves)):
                     self.rotate_face(moves[i])
+                # print(str(random_key))
+                # print(f"randomkey {random_key}")
+
                 self.move_history.append(str(random_key))
         if alg_name == "random_moves":
             for j in range(int(move_count)):
                 random_move = random.choice(list(viable_moves))
-                moves = random_move
-                for i in range(len(moves)):
-                    self.rotate_face(moves[i])
-                    self.move_history.append(moves[i])
+                self.rotate_face(random_move)
+                self.move_history.append(random_move)
         if alg_name == "random_scramble":
             scramble = "B' D2 L' F' B2 U2 D  F2 R' U' D2 L2 F L2 B F2 R D L D' F2 L2 B' L' R'"
             moves = scramble.split(" ")

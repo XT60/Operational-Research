@@ -221,7 +221,7 @@ class Drawer:
         temp_alg = "U' F2 R' L' U' B R2 D B U' R2 L B2 D' B2 U F2 B2 U' L2 B2 L2"
         moves = temp_alg.split(" ")
         moves = []
-        solved_cube = RubiksCube("B' D2 L' F' B2 U2 D  F2 R' U' D2 L2 F L2 B F2 R D L D' F2 L2 B' L' R'")
+        solved_cube = RubiksCube("B' D2 L' F' B2 U2 D F2 R' U' D2 L2 F L2 B F2 R D L D' F2 L2 B' L' R'")
         # solved_cube.make_alg("scramble")
         lock = threading.Lock()
         stop_event = threading.Event()
