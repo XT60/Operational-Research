@@ -225,7 +225,7 @@ class Drawer:
         # solved_cube.make_alg("scramble")
         lock = threading.Lock()
         stop_event = threading.Event()
-        solver = BeesAlgorithm(solved_cube, 300, 200, 100, 200)
+        solver = BeesAlgorithm(solved_cube, 200, 200, 200, 200)
         solver_thread = threading.Thread(target=self.run_solver, args=(solver, 0, solved_cube, lock, stop_event))
         solver_thread.start()
         while not glfw.window_should_close(window):

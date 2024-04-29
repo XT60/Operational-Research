@@ -1,5 +1,5 @@
 import random
-
+import tqdm
 from .rubikscube import RubiksCube
 
 
@@ -20,8 +20,12 @@ class BeesAlgorithm:
 
         for _ in range(self.num_local_searches):
             candidate = cube.copy()
-            candidate.make_alg("random_algs", move_count=random.randint(1, 5))
-            candidate.make_alg("random_moves", move_count=random.randint(0, 2))
+            candidate_fitness = candidate.get_score()
+            if candidate_fitness < 10:
+                candidate.make_alg("random_algs", move_count=1)
+            else:
+                candidate.make_alg("random_algs", move_count=random.randint(1, 10))
+                candidate.make_alg("random_moves", move_count=random.randint(0, 2))
             candidate_fitness = candidate.get_score()
             if candidate_fitness < best_fitness:
                 best = candidate.copy()
@@ -31,7 +35,7 @@ class BeesAlgorithm:
     def global_search(self):
         new_population = []
         j = 0
-        for i in range(self.num_scouts):
+        for i in tqdm.tqdm(range(self.num_scouts), desc="global_search"):
 
             if i % 3 == 0:
                 if j >= len(self.best_cubes):
@@ -41,8 +45,11 @@ class BeesAlgorithm:
                     j += 0.5
             else:
                 new_cube = self.cube.copy()
-            new_cube.make_alg("random_moves", move_count=30)
-            # new_cube.make_alg("random_algs", move_count=30)
+            if new_cube.get_score() < 10:
+                new_cube.make_alg("random_algs", move_count=4)
+            else:
+                new_cube.make_alg("random_moves", move_count=random.randint(0, 30))
+                new_cube.make_alg("random_algs", move_count=random.randint(20, 30))
             new_population.append(new_cube)
         return new_population
 
@@ -65,7 +72,7 @@ class BeesAlgorithm:
             if iter_num > self.max_iterations:
                 print("Above Limit")
                 return False, self.population[0]
-            self.population = [self.local_search(cube) for cube in self.population]
+            self.population = [self.local_search(cube) for cube in tqdm.tqdm(self.population, desc="local_search")]
             self.population.extend(self.global_search())
             self.population.sort(key=lambda x: x.get_score())
             self.best_cubes = self.population[:len(self.population)//5]
