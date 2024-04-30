@@ -6,7 +6,6 @@ from .solver import BeesAlgorithm
 import threading
 
 
-
 class Drawer:
     def __init__(self):
         self.last_mouse_pos = (0, 0)
@@ -55,8 +54,13 @@ class Drawer:
             glTranslatef(-x, -y, -z)
 
         glBegin(GL_QUADS)
+        specular = [1.0, 1.0, 1.0, 1.0]  # White specular highlight
+        shininess = [50.0]  # High shininess for a more reflective surface
+        glMaterialfv(GL_FRONT, GL_SPECULAR, specular)
+        glMaterialfv(GL_FRONT, GL_SHININESS, shininess)
         for i, row in enumerate(face):
             for j, color in enumerate(row):
+
                 if color == 1:
                     glColor3f(0, 1, 0)
                 elif color == 2:
@@ -69,7 +73,7 @@ class Drawer:
                     glColor3f(1, 0.5, 0)
                 elif color == 6:
                     glColor3f(1, 0, 0)
-
+                glNormal3f(0, 0, 1)
                 vertices = [
                     (x + j * 1 / 3, y - i * 1 / 3, z),
                     (x + (j + 1) * 1 / 3, y - i * 1 / 3, z),
@@ -186,7 +190,6 @@ class Drawer:
         print(f"Score: {solved_cube.get_score()}")
         is_solved = False
         while not stop_event.is_set() and not is_solved:
-
             is_solved, new_cube = solver.solve(i)
             new_cube = new_cube.copy()
             with lock:
@@ -194,9 +197,11 @@ class Drawer:
             print(f"Score: {solved_cube.get_score()} {solved_cube.move_history}")
 
             i += 1
+
     def run(self):
         if not glfw.init():
             return
+        glfw.window_hint(glfw.SAMPLES, 4)
 
         window = glfw.create_window(640, 480, "Rubik's Cube", None, None)
         if not window:
@@ -206,7 +211,29 @@ class Drawer:
         glfw.make_context_current(window)
         glfw.set_window_size_callback(window, self.window_resize_callback)
 
+        glEnable(GL_LIGHTING)
+        glEnable(GL_LIGHT0)
+
+
+        glEnable(GL_COLOR_MATERIAL)
+        light_position = [0, 2, 2, 0]  # Directional light
+        glLightfv(GL_LIGHT0, GL_POSITION, light_position)
+
+        # Setting ambient, diffuse and specular lighting
+        ambient_light = [0.2, 0.2, 0.2, 1.0]
+        diffuse_light = [0.7, 0.7, 0.7, 1.0]
+        specular_light = [0.9, 0.9, 0.9, 1.0]
+        glLightfv(GL_LIGHT0, GL_AMBIENT, ambient_light)
+        glLightfv(GL_LIGHT0, GL_DIFFUSE, diffuse_light)
+        glLightfv(GL_LIGHT0, GL_SPECULAR, specular_light)
+
+        glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
+
         glEnable(GL_DEPTH_TEST)
+        glEnable(GL_MULTISAMPLE)
+        glDepthFunc(GL_LESS)  # Specify depth-testing interpret
+        glEnable(GL_BLEND)
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         glMatrixMode(GL_PROJECTION)
         gluPerspective(45, 640 / 480, 0.1, 50.0)
 
@@ -228,9 +255,8 @@ class Drawer:
         solver = BeesAlgorithm(solved_cube, 250, 120, 50, 200)
         solver_thread = threading.Thread(target=self.run_solver, args=(solver, 0, solved_cube, lock, stop_event))
         solver_thread.start()
+
         while not glfw.window_should_close(window):
-
-
             # if i % 100 == 0 and (current_move_index < len(moves) or 1):
             #     # self.cube.rotate_face(moves[current_move_index])
             #     # current_move_index += 1
@@ -250,7 +276,7 @@ class Drawer:
             glLoadIdentity()
             gluLookAt(2, 1, 3, 0, 0, 0, 0, 1, 0)
             # print(self.cube.get_score())
-
+            glPushMatrix()
             glRotatef(self.scene_rotation[0], 1, 0, 0)
             glRotatef(self.scene_rotation[1], 0, 1, 0)
             glScalef(self.scene_scale, self.scene_scale, self.scene_scale)
@@ -261,7 +287,7 @@ class Drawer:
             self.draw_cube_face(current_cube.cube['R'], 'R')
             self.draw_cube_face(current_cube.cube['B'], 'B')
             self.draw_cube_face(current_cube.cube['D'], 'D')
-
+            glPopMatrix()
             glfw.swap_buffers(window)
             glfw.poll_events()
 

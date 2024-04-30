@@ -59,6 +59,7 @@ class RubiksCube:
         new_cube.cube = copy.deepcopy(self.cube)
         new_cube.move_history = copy.deepcopy(self.move_history)
         return new_cube
+
     def update(self, other):
         self.scramble = other.scramble
         self.cube = copy.deepcopy(other.cube)
@@ -385,6 +386,26 @@ class RubiksCube:
             self.cube['L'] = np.rot90(temp_right, k=2)
             self.cube['R'] = np.rot90(temp_left, k=2)
 
+    def reverse_moves(self, moves):
+        # Split the input string into individual moves
+        move_list = moves.strip().split()
+
+        # Reverse the order of moves
+        reversed_moves = move_list[::-1]
+
+        # Invert each move
+        inverted_moves = []
+        for move in reversed_moves:
+            if "'" in move:
+                inverted_moves.append(move.replace("'", ""))
+            elif "2" in move:
+                inverted_moves.append(move)  # 180-degree rotations are self-inverse
+            else:
+                inverted_moves.append(move + "'")
+
+        # Join the inverted moves back into a string
+        return ' '.join(inverted_moves)
+
     def make_alg(self, alg_name, alg="", move_count=1):
         permutation = {k: v for (k, v) in enumerate(perms_all)}
         if alg != "":
@@ -410,6 +431,28 @@ class RubiksCube:
                 # print(f"randomkey {random_key}")
 
                 self.move_history.append(str(random_key))
+        if alg_name == "random_moves_algs_moves_prim":
+            random_moves_str = " ".join([random.choice(list(viable_moves)) for _ in range(random.randint(0, 7))])
+            random_moves = random_moves_str.split(" ")
+
+            reverse_random_moves = (self.reverse_moves(random_moves_str)).split(" ")
+            for i in range(len(random_moves)):
+                self.rotate_face(random_moves[i])
+                self.move_history.append(random_moves[i])
+
+            for j in range(int(move_count)):
+                random_key = random.choice(list(permutation.keys()))
+                random_value = permutation[random_key]
+                moves = random_value.split(" ")
+                for i in range(len(moves)):
+                    self.rotate_face(moves[i])
+                # print(str(random_key))
+                # print(f"randomkey {random_key}")
+
+                self.move_history.append(str(random_key))
+            for i in range(len(reverse_random_moves)):
+                self.rotate_face(reverse_random_moves[i])
+                self.move_history.append(reverse_random_moves[i])
         if alg_name == "random_moves":
             for j in range(int(move_count)):
                 random_move = random.choice(list(viable_moves))
@@ -441,10 +484,10 @@ class RubiksCube:
         score = 0
         for face in self.cube:
             center = self.cube[face][1, 1]
-            for row in self.cube[face]:
-                for cell in row:
-                    if cell != center:
-                        score += 1
+            # for row in self.cube[face]:
+            #     for cell in row:
+            #         if cell != center:
+            #             score += 1/3
             adjacent = self.adjacencies[face]
             adjacent_edges = adjacent["edges"]
             adjacent_corners = adjacent["corners"]

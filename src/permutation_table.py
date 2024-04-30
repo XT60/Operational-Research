@@ -39,7 +39,7 @@ perms = [
 ]
 
 
-moves = ['F', 'R', 'U', 'B', 'L', 'D', 'x', 'y', 'z']
+moves = ['F', 'R', 'U', 'B', 'L', 'D']
 moves_xyz = ['x', 'y', 'z', '']
 directions = ['', "'", '2']
 
