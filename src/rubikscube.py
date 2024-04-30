@@ -414,12 +414,14 @@ class RubiksCube:
                 self.rotate_face(moves[i])
                 self.move_history.append(moves[i])
             return
+
         if alg_name == "Aa":
             alg_str = "x z' R2 U2 R' D' R U2 R' D R' z x'"
             moves = alg_str.split(" ")
             for i in range(len(moves)):
                 self.rotate_face(moves[i])
             self.move_history.append(alg_name)
+
         if alg_name == "random_algs":
             for j in range(int(move_count)):
                 random_key = random.choice(list(permutation.keys()))
@@ -431,39 +433,50 @@ class RubiksCube:
                 # print(f"randomkey {random_key}")
 
                 self.move_history.append(str(random_key))
+
         if alg_name == "random_moves_algs_moves_prim":
-            random_moves_str = " ".join([random.choice(list(viable_moves)) for _ in range(random.randint(0, 7))])
-            random_moves = random_moves_str.split(" ")
-
-            reverse_random_moves = (self.reverse_moves(random_moves_str)).split(" ")
-            for i in range(len(random_moves)):
-                self.rotate_face(random_moves[i])
-                self.move_history.append(random_moves[i])
-
             for j in range(int(move_count)):
-                random_key = random.choice(list(permutation.keys()))
-                random_value = permutation[random_key]
-                moves = random_value.split(" ")
-                for i in range(len(moves)):
-                    self.rotate_face(moves[i])
-                # print(str(random_key))
-                # print(f"randomkey {random_key}")
+                random_moves_str = " ".join([random.choice(list(viable_moves)) for _ in range(random.randint(0, 7))])
+                random_moves = random_moves_str.split(" ")
+                if random_moves[0] != "":
+                    reverse_random_moves = (self.reverse_moves(random_moves_str)).split(" ")
+                    for i in range(len(random_moves)):
+                        self.rotate_face(random_moves[i])
+                        self.move_history.append(random_moves[i])
 
-                self.move_history.append(str(random_key))
-            for i in range(len(reverse_random_moves)):
-                self.rotate_face(reverse_random_moves[i])
-                self.move_history.append(reverse_random_moves[i])
+                    random_key = random.choice(list(permutation.keys()))
+                    random_value = permutation[random_key]
+                    moves = random_value.split(" ")
+
+                    for i in range(len(moves)):
+                        self.rotate_face(moves[i])
+                    self.move_history.append(str(random_key))
+
+                    for i in range(len(reverse_random_moves)):
+                        self.rotate_face(reverse_random_moves[i])
+                        self.move_history.append(reverse_random_moves[i])
+                else:
+                    random_key = random.choice(list(permutation.keys()))
+                    random_value = permutation[random_key]
+                    moves = random_value.split(" ")
+
+                    for i in range(len(moves)):
+                        self.rotate_face(moves[i])
+                    self.move_history.append(str(random_key))
+
         if alg_name == "random_moves":
             for j in range(int(move_count)):
                 random_move = random.choice(list(viable_moves))
                 self.rotate_face(random_move)
                 self.move_history.append(random_move)
+
         if alg_name == "random_scramble":
             scramble = "B' D2 L' F' B2 U2 D  F2 R' U' D2 L2 F L2 B F2 R D L D' F2 L2 B' L' R'"
             moves = scramble.split(" ")
             for i in range(len(moves)):
                 self.rotate_face(moves[i])
                 self.move_history.append(moves[i])
+
         if alg_name == "scramble":
             moves = self.scramble.split(" ")
             print(moves)

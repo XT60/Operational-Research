@@ -38,18 +38,18 @@ perms = [
     "M2 U M2 U2 M2 U M2"
 ]
 
-
-moves = ['F', 'R', 'U', 'B', 'L', 'D']
-moves_xyz = ['x', 'y', 'z', '']
+moves = ['F', 'R', 'U', 'B', 'L', 'D', 'x', 'y', 'z']
 directions = ['', "'", '2']
 
+moves_xyz = ['x', 'y', 'z', '']
 viable_moves = [move + direction for move in moves for direction in directions]
 print(viable_moves)
 n = 3
-pp = [' '.join(perm).strip() for perm in list(itertools.permutations(moves_xyz, n)) + list(itertools.permutations(moves_xyz, 1))]
-viable_moves_xyz = [move + direction for move in pp for direction in directions][:-3]
+pp = [' '.join(perm).strip().replace("  ", " ") for perm in list(itertools.permutations(moves_xyz, n)) +
+      list(itertools.permutations(moves_xyz, 1))]
+viable_moves_xyz = [move + direction for move in pp for direction in directions if move + direction not in ['', "'", '2']]
 
 print(viable_moves_xyz)
 
-perms_all = [xyz + " " + p for xyz in viable_moves_xyz for p in perms]
+perms_all = [xyz + " " + p for xyz in viable_moves_xyz for p in perms if xyz + " " + p not in [" ", '', "'", '2']]
 print(perms_all)

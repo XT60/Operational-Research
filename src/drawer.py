@@ -175,6 +175,19 @@ class Drawer:
             else:
                 self.cube.rotate_face('z')
 
+    def draw_cube(self, cube):
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+        glMatrixMode(GL_MODELVIEW)
+        glLoadIdentity()
+        gluLookAt(2, 1, 3, 0, 0, 0, 0, 1, 0)
+        glPushMatrix()
+        glRotatef(self.scene_rotation[0], 1, 0, 0)
+        glRotatef(self.scene_rotation[1], 0, 1, 0)
+        glScalef(self.scene_scale, self.scene_scale, self.scene_scale)
+        for face_name, face in cube.cube.items():
+            self.draw_cube_face(face, face_name)
+        glPopMatrix()
+
     def window_resize_callback(self, window, width, height):
         # Update the viewport to match the new window dimensions
         glViewport(0, 0, width, height)
@@ -187,18 +200,18 @@ class Drawer:
         glMatrixMode(GL_MODELVIEW)
 
     def run_solver(self, solver, i, solved_cube, lock, stop_event):
-        print(f"Score: {solved_cube.get_score()}")
+        print(f"\n\nScore: {solved_cube.get_score()}")
         is_solved = False
         while not stop_event.is_set() and not is_solved:
             is_solved, new_cube = solver.solve(i)
             new_cube = new_cube.copy()
             with lock:
                 solved_cube.update(new_cube)
-            print(f"Score: {solved_cube.get_score()} {solved_cube.move_history}")
+            print(f"\n\nScore: {solved_cube.get_score()} \n\n{solved_cube.move_history}")
 
             i += 1
 
-    def run(self):
+    def init_gl(self):
         if not glfw.init():
             return
         glfw.window_hint(glfw.SAMPLES, 4)
@@ -216,7 +229,7 @@ class Drawer:
 
 
         glEnable(GL_COLOR_MATERIAL)
-        light_position = [0, 2, 2, 0]  # Directional light
+        light_position = [2, 1, 3, 0]  # Directional light
         glLightfv(GL_LIGHT0, GL_POSITION, light_position)
 
         # Setting ambient, diffuse and specular lighting
@@ -241,7 +254,9 @@ class Drawer:
         glfw.set_mouse_button_callback(window, self.mouse_button_callback)
         glfw.set_key_callback(window, self.key_callback)
         glfw.set_scroll_callback(window, self.scroll_callback)
-
+        return window
+    def run(self):
+        window = self.init_gl()
         i = 1
         current_move_index = 0
         temp_alg = "F L F U' R U F2 L2 U' L' B D' B' L2 U"
@@ -249,10 +264,11 @@ class Drawer:
         moves = temp_alg.split(" ")
         moves = []
         solved_cube = RubiksCube("B' D2 L' F' B2 U2 D F2 R' U' D2 L2 F L2 B F2 R D L D' F2 L2 B' L' R'")
-        # solved_cube.make_alg("scramble")
+
+        solver = BeesAlgorithm(solved_cube, 250, 120, 40, 200)
+
         lock = threading.Lock()
         stop_event = threading.Event()
-        solver = BeesAlgorithm(solved_cube, 250, 120, 50, 200)
         solver_thread = threading.Thread(target=self.run_solver, args=(solver, 0, solved_cube, lock, stop_event))
         solver_thread.start()
 
@@ -269,26 +285,8 @@ class Drawer:
             # i += 1
             with lock:
                 current_cube = solved_cube.copy()
-            # self.cube.make_alg("Aa")
-
-            glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-            glMatrixMode(GL_MODELVIEW)
-            glLoadIdentity()
-            gluLookAt(2, 1, 3, 0, 0, 0, 0, 1, 0)
-            # print(self.cube.get_score())
-            glPushMatrix()
-            glRotatef(self.scene_rotation[0], 1, 0, 0)
-            glRotatef(self.scene_rotation[1], 0, 1, 0)
-            glScalef(self.scene_scale, self.scene_scale, self.scene_scale)
-
-            self.draw_cube_face(current_cube.cube['U'], 'U')
-            self.draw_cube_face(current_cube.cube['L'], 'L')
-            self.draw_cube_face(current_cube.cube['F'], 'F')
-            self.draw_cube_face(current_cube.cube['R'], 'R')
-            self.draw_cube_face(current_cube.cube['B'], 'B')
-            self.draw_cube_face(current_cube.cube['D'], 'D')
-            glPopMatrix()
+            self.draw_cube(current_cube)
             glfw.swap_buffers(window)
             glfw.poll_events()
-
         glfw.terminate()
+        stop_event.set()
