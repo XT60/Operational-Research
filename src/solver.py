@@ -13,6 +13,7 @@ class BeesAlgorithm:
         self.num_scouts = num_scouts
         self.num_local_searches = num_local_searches
         self.max_iterations = max_iterations
+        self.score_threshold = 5
 
     def local_search(self, cube):
         best = cube.copy()
@@ -21,11 +22,12 @@ class BeesAlgorithm:
         for _ in range(self.num_local_searches):
             candidate = cube.copy()
             candidate_fitness = candidate.get_score()
-            if candidate_fitness < 10:
-                candidate.make_alg("random_algs", move_count=1)
+            if candidate_fitness < self.score_threshold:
+                candidate.make_alg("random_algs", move_count=random.randint(1, 2))
             else:
+                candidate.make_alg("random_moves", move_count=random.randint(0, 7))
                 candidate.make_alg("random_algs", move_count=random.randint(1, 10))
-                candidate.make_alg("random_moves", move_count=random.randint(0, 2))
+                candidate.make_alg("random_moves", move_count=random.randint(0, 10))
             candidate_fitness = candidate.get_score()
             if candidate_fitness < best_fitness:
                 best = candidate.copy()
@@ -37,19 +39,19 @@ class BeesAlgorithm:
         j = 0
         for i in tqdm.tqdm(range(self.num_scouts), desc="global_search"):
 
-            if i % 3 == 0:
+            if i % 5 == 0:
                 if j >= len(self.best_cubes):
                     new_cube = self.cube.copy()
                 else:
                     new_cube = self.best_cubes[int(j)].copy()
-                    j += 0.5
+                    j += 0.2
             else:
                 new_cube = self.cube.copy()
-            if new_cube.get_score() < 10:
-                new_cube.make_alg("random_algs", move_count=4)
+            if new_cube.get_score() < self.score_threshold:
+                new_cube.make_alg("random_algs", move_count=random.randint(1, 4))
             else:
                 new_cube.make_alg("random_moves", move_count=random.randint(0, 30))
-                new_cube.make_alg("random_algs", move_count=random.randint(20, 30))
+                # new_cube.make_alg("random_algs", move_count=random.randint(20, 30))
             new_population.append(new_cube)
         return new_population
 
@@ -75,8 +77,9 @@ class BeesAlgorithm:
             self.population = [self.local_search(cube) for cube in tqdm.tqdm(self.population, desc="local_search")]
             self.population.extend(self.global_search())
             self.population.sort(key=lambda x: x.get_score())
-            # self.best_cubes = self.population[:len(self.population)//5]
+            self.best_cubes = self.population[:len(self.population)//5]
             self.population = self.population[:len(self.population) // 2]  # Keep the best half
+            # self.population = self.population[:len(self.population) // 5]  # Keep the best fifth
             for cube in self.population:
                 if cube.get_score() == 0:
                     print("Solved!")
