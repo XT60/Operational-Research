@@ -96,14 +96,11 @@ class BeesAlgorithm:
 
                 for cube in self.population:
                     if cube.get_score()[0] == 0:
-                        print("Solved!")
-                        print(translate_moves(cube.move_history))
                         return True, self.population[0], translate_moves(cube.move_history)
                 return False, self.population[0], []
         else:
             if iter_num > self.max_iterations:
-                print("Above Limit")
-                return False, self.population[0]
+                return False, self.population[0], ["Above Limit"]
             self.population = [self.local_search(cube) for cube in tqdm.tqdm(self.population, desc="local_search")]
             self.population.extend(self.global_search())
             self.population.sort(key=lambda x: (x.get_score()[2], x.get_score()[1] if x.get_score()[2] == 0 else 0))
@@ -113,7 +110,5 @@ class BeesAlgorithm:
             # self.population = self.population[:len(self.population) // 5]  # Keep the best fifth
             for cube in self.population:
                 if cube.get_score()[0] == 0:
-                    print("Solved!")
-                    print(translate_moves(cube.move_history))
                     return True, cube, translate_moves(cube.move_history)
             return False, self.population[0], []

@@ -225,20 +225,28 @@ class Drawer:
         glMatrixMode(GL_MODELVIEW)
 
     def run_solver(self, solver, i, solved_cube, lock, stop_event, solution):
-        print(f"Iteration: {0}")
-        print(f"Score: {solved_cube.get_score()[0]}\nScore_corners: {solved_cube.get_score()[2]}\nScore_edges: {solved_cube.get_score()[1]}\n\n")
+        print(f"________________________\nIteration: {0}")
+        print(f"\nScore: {solved_cube.get_score()[0]}\nScore_corners: {solved_cube.get_score()[2]}\nScore_edges: {solved_cube.get_score()[1]}\n________________________\n\n")
         is_solved = False
         while not stop_event.is_set() and not is_solved:
             if i != 0:
-                print(f"Iteration: {i}")
+                print(f"________________________\nIteration: {i}")
             is_solved, new_cube, solution = solver.solve(i)
             new_cube = new_cube.copy()
             with lock:
                 self.solution = solution
                 solved_cube.update(new_cube)
-            print(f"\n\nScore: {solved_cube.get_score()[0]}\nScore_corners: {solved_cube.get_score()[2]}\nScore_edges: {solved_cube.get_score()[1]}")
-
+            print(f"\nScore: {solved_cube.get_score()[0]}\nScore_corners: {solved_cube.get_score()[2]}\nScore_edges: {solved_cube.get_score()[1]}\n________________________\n\n")
+            if len(solution) == 1 and solution[0] == "Above Limit":
+                break
             i += 1
+        a = " ".join(translate_moves(self.cube.move_history))
+        if is_solved:
+            print(
+                f"\n\n\n________________________________________________\n\nSolved the Rubik's Cube!\n\nFound Solution:\n\n{a}\n\n________________________________________________\n\n")
+        else:
+            self.solution = []
+            print("Above Limit, Aborting")
 
     def init_gl(self):
         if not glfw.init():
@@ -293,9 +301,11 @@ class Drawer:
         moves = temp_alg.split(" ")
         moves = []
         self.cube = RubiksCube("B' D2 L' F' B2 U2 D F2 R' U' D2 L2 F L2 B F2 R D L D' F2 L2 B' L' R'")
+        # self.cube = RubiksCube("")
+        print(f"________________________________________________\nSolving a Rubik's Cube scrambled with \n\n{self.cube.get_scramble()}\n\n________________________________________________\n\n\n")
         # self.cube = RubiksCube()
 
-        solver = BeesAlgorithm(self.cube, 300, 300, 50, 2000)
+        solver = BeesAlgorithm(self.cube, 300, 300, 50, 200)
 
         lock = threading.Lock()
         stop_event = threading.Event()
@@ -308,6 +318,8 @@ class Drawer:
         delay_solving = 10
         while not glfw.window_should_close(window):
             if len(self.solution) > 0:
+
+
                 if j == 0:
                     self.cube.reset_state()
                     self.cube.make_alg("scramble")
