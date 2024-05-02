@@ -3,15 +3,24 @@ import itertools
 perms = [
     # permutes two edges: U face, bottom edge and right edge
     "F' L' B' R' U' R U' B L F R U R' U",
+
     "x L2 D2 L' U' L D2 L' U L'",
     "x' L2 D2 L U L' D2 L U' L",
     "x R2 F R F' R U2 r' U r U2",
     "R U R' F' R U R' U' R' F R2 U' R'",
     "R U R' U R U2 R'"
     #permutes two edges: U face, bottom edge and left edge
+    
+    
     "F R B L U L' U B' R' F' L' U' L U'",
+
+
     # permutes two corners: U face, bottom left and bottom right
+
+
     "U2 B U2 B' R2 F R' F' U2 F' U2 F R'",
+
+
     # # permutes three corners: U face, bottom left and top left
     # "U2 R U2 R' F2 L F' L' U2 L' U2 L F'",
     # # permutes three centers: F face, top, right, bottom
@@ -29,27 +38,71 @@ perms = [
     # permutes three corners: U face, bottom right, bottom left and top left
     # "F' U B U' F U B' U'",
     # permutes three corners: U face, bottom left, bottom right and top right
+
+
     "F U' B' U F' U' B U",
+
+
     # permutes three edges: F face bottom, F face top, B face top
     # "L' U2 L R' F2 R",
     # permutes three edges: F face top, B face top, B face bottom
     # "R' U2 R L' B2 L",
     # H permutation: U Face, swaps the edges horizontally and vertically
-    "M2 U M2 U2 M2 U M2"
+
+
+    # "M2 U M2 U2 M2 U M2"
 ]
 
-moves = ['F', 'R', 'U', 'B', 'L', 'D', 'x', 'y', 'z']
+corner_perms = ["F R U' R' U' R U R' F' R U R' U' R' F R F'",
+                "R U R' U' R' F R2 U' R' U' R U R' F'",
+                "x L2 D2 L' U' L D2 L' U L'",
+                "x' L2 D2 L U L' D2 L U' L",
+                "R U R' F' R U R' U' R' F R2 U' R'",
+                "x' L' U L D' L' U' L D L' U' L D' L' U L D",
+                "R U R' U R U R' F' R U R' U' R' F R2 U' R' U2 R U' R'",
+                "R' U R' U' y R' F' R2 U' R' U R' F R F",
+                "R' U' R U R' U' R U L R' U' R U R' U' R U L R' U' R U R' U' R U L2",
+                "R U' R' U R U' R' U L R U' R' U R U' R' U L R U' R' U R U' R' U L2",
+                "R' U' R U R' U' R U L2 R' U' R U R' U' R U R' U' R U R' U' R U L2",
+                "R U' R' U R U' R' U L2 R U' R' U R U' R' U R U' R' U R U' R' U L2",
+                "R U' R' U R U' R' U L R U' R' U R U' R' U R U' R' U R U' R' U L'",
+                "R U' R' U R U' R' U R U' R' U R U' R' U L R U' R' U R U' R' U L'"]
+edge_perms = ["M2 U M2 U2 M2 U M2",
+              "M2 U' M U2 M' U' M2",
+              "R U' R U R U R U' R' U' R2",
+              "R2 U R U R' U' R' U' R' U R'",
+              "M' U M2 U M2 U M' U2 M2"]
+
+moves = ['F', 'R', 'U', 'B', 'L', 'D', 'M', 'E', 'S', 'x', 'y', 'z']
 directions = ['', "'", '2']
 
 moves_xyz = ['x', 'y', 'z', '']
 viable_moves = [move + direction for move in moves for direction in directions]
-print(viable_moves)
+# print(viable_moves)
 n = 3
 pp = [' '.join(perm).strip().replace("  ", " ") for perm in list(itertools.permutations(moves_xyz, n)) +
       list(itertools.permutations(moves_xyz, 1))]
 viable_moves_xyz = [move + direction for move in pp for direction in directions if move + direction not in ['', "'", '2']]
 
-print(viable_moves_xyz)
+# print(viable_moves_xyz)
 
 perms_all = [xyz + " " + p for xyz in viable_moves_xyz for p in perms if xyz + " " + p not in [" ", '', "'", '2']]
-print(perms_all)
+# print(perms_all)
+
+
+def translate_moves(move_history):
+    translated_moves = []
+
+    for move in move_history:
+        if 'Corners' in move:
+            index = int(move.split('_')[0])
+            translated_moves.append(corner_perms[index])
+        elif 'Edges' in move:
+            index = int(move.split('_')[0])
+            translated_moves.append(edge_perms[index])
+        elif move.isdigit():  # Checks if move is purely a number
+            translated_moves.append(perms_all[int(move)])
+        else:
+            translated_moves.append(move)  # Directly append the move if no translation is needed
+
+    return " ".join(translated_moves).split(" ")

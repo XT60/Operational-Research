@@ -2,7 +2,7 @@ import copy
 import random
 
 import numpy as np
-from .permutation_table import perms_all, viable_moves
+from .permutation_table import perms_all, viable_moves, perms, edge_perms, corner_perms
 
 
 class RubiksCube:
@@ -53,6 +53,19 @@ class RubiksCube:
         }
         self.move_history = []
         self.scramble = scramble
+
+    def get_scramble(self):
+        return self.scramble
+
+    def reset_state(self):
+        self.cube = {
+            'F': np.array([[1 for _ in range(3)] for _ in range(3)]),
+            'B': np.array([[2 for _ in range(3)] for _ in range(3)]),
+            'U': np.array([[3 for _ in range(3)] for _ in range(3)]),
+            'D': np.array([[4 for _ in range(3)] for _ in range(3)]),
+            'L': np.array([[5 for _ in range(3)] for _ in range(3)]),
+            'R': np.array([[6 for _ in range(3)] for _ in range(3)])
+        }
 
     def copy(self):
         new_cube = RubiksCube(self.scramble)
@@ -299,7 +312,6 @@ class RubiksCube:
             self.cube['U'] = np.rot90(temp_back, k=2)
             self.cube['D'] = temp_front
             self.cube['B'] = np.rot90(temp_down, k=2)
-            # self.display()
         elif face == "x2":
             self.cube["R"] = np.rot90(self.cube["R"], k=2)
             self.cube["L"] = np.rot90(self.cube["L"], k=2)
@@ -312,6 +324,39 @@ class RubiksCube:
             self.cube['U'] = temp_down
             self.cube['D'] = temp_up
             self.cube['B'] = np.rot90(temp_front, k=2)
+            # self.display()
+        elif face == "M":
+            # self.display()
+            temp_front = np.copy(self.cube['F'])
+            temp_up = np.copy(self.cube['U'])
+            temp_down = np.copy(self.cube['D'])
+            temp_back = np.copy(self.cube['B'])
+
+            self.cube['F'][:, 1] = temp_up[:, 1]
+            self.cube['U'][:, 1] = np.rot90(temp_back, k=2)[:, 1]
+            self.cube['D'][:, 1] = temp_front[:, 1]
+            self.cube['B'][:, 1] = np.rot90(temp_down, k=2)[:, 1]
+        elif face == "M'":
+            temp_front = np.copy(self.cube['F'])
+            temp_up = np.copy(self.cube['U'])
+            temp_down = np.copy(self.cube['D'])
+            temp_back = np.copy(self.cube['B'])
+
+            self.cube['F'][:, 1] = temp_down[:, 1]
+            self.cube['U'][:, 1] = temp_front[:, 1]
+            self.cube['D'][:, 1] = np.rot90(temp_back, k=2)[:, 1]
+            self.cube['B'][:, 1] = np.rot90(temp_up, k=2)[:, 1]
+            # self.display()
+        elif face == "M2":
+            temp_front = np.copy(self.cube['F'])
+            temp_up = np.copy(self.cube['U'])
+            temp_down = np.copy(self.cube['D'])
+            temp_back = np.copy(self.cube['B'])
+
+            self.cube['F'][:, 1] = np.rot90(temp_back, k=2)[:, 1]
+            self.cube['U'][:, 1] = temp_down[:, 1]
+            self.cube['D'][:, 1] = temp_up[:, 1]
+            self.cube['B'][:, 1] = np.rot90(temp_front, k=2)[:, 1]
         elif face == "y":
             self.cube["U"] = np.rot90(self.cube["U"], k=-1)
             self.cube["D"] = np.rot90(self.cube["D"])
@@ -348,6 +393,36 @@ class RubiksCube:
             self.cube['L'] = temp_right
             self.cube['B'] = temp_front
             self.cube['R'] = temp_left
+        elif face == "E":
+            temp_front = np.copy(self.cube['F'])
+            temp_left = np.copy(self.cube['L'])
+            temp_back = np.copy(self.cube['B'])
+            temp_right = np.copy(self.cube['R'])
+
+            self.cube['F'][1, :] = temp_left[1, :]
+            self.cube['L'][1, :] = temp_back[1, :]
+            self.cube['B'][1, :] = temp_right[1, :]
+            self.cube['R'][1, :] = temp_front[1, :]
+        elif face == "E'":
+            temp_front = np.copy(self.cube['F'])
+            temp_left = np.copy(self.cube['L'])
+            temp_back = np.copy(self.cube['B'])
+            temp_right = np.copy(self.cube['R'])
+
+            self.cube['F'][1, :] = temp_right[1, :]
+            self.cube['L'][1, :] = temp_front[1, :]
+            self.cube['B'][1, :] = temp_left[1, :]
+            self.cube['R'][1, :] = temp_back[1, :]
+        elif face == "E2":
+            temp_front = np.copy(self.cube['F'])
+            temp_left = np.copy(self.cube['L'])
+            temp_back = np.copy(self.cube['B'])
+            temp_right = np.copy(self.cube['R'])
+
+            self.cube['F'][1, :] = temp_back[1, :]
+            self.cube['L'][1, :] = temp_right[1, :]
+            self.cube['B'][1, :] = temp_front[1, :]
+            self.cube['R'][1, :] = temp_left[1, :]
         elif face == "z":
             self.cube["F"] = np.rot90(self.cube["F"], k=-1)
             self.cube["B"] = np.rot90(self.cube["B"])
@@ -385,6 +460,37 @@ class RubiksCube:
             self.cube['D'] = np.rot90(temp_top, k=2)
             self.cube['L'] = np.rot90(temp_right, k=2)
             self.cube['R'] = np.rot90(temp_left, k=2)
+        elif face == "S":
+            temp_top = np.copy(self.cube['U'])
+            temp_bottom = np.copy(self.cube['D'])
+            temp_left = np.copy(self.cube['L'])
+            temp_right = np.copy(self.cube['R'])
+
+            self.cube['U'][1, :] = np.rot90(temp_left, k=-1)[1, :]
+            self.cube['D'][1, :] = np.rot90(temp_right, k=-1)[1, :]
+            self.cube['L'][:, 1] = np.rot90(temp_bottom, k=-1)[:, 1]
+            self.cube['R'][:, 1] = np.rot90(temp_top, k=-1)[:, 1]
+        elif face == "S'":
+            temp_top = np.copy(self.cube['U'])
+            temp_bottom = np.copy(self.cube['D'])
+            temp_left = np.copy(self.cube['L'])
+            temp_right = np.copy(self.cube['R'])
+
+            self.cube['U'][1, :] = np.rot90(temp_right)[1, :]
+            self.cube['D'][1, :] = np.rot90(temp_left)[1, :]
+            self.cube['L'][:, 1] = np.rot90(temp_top)[:, 1]
+            self.cube['R'][:, 1] = np.rot90(temp_bottom)[:, 1]
+        elif face == "S2":
+            # Temporarily store the edges
+            temp_top = np.copy(self.cube['U'])
+            temp_bottom = np.copy(self.cube['D'])
+            temp_left = np.copy(self.cube['L'])
+            temp_right = np.copy(self.cube['R'])
+
+            self.cube['U'][1, :] = np.rot90(temp_bottom, k=2)[1, :]
+            self.cube['D'][1, :] = np.rot90(temp_top, k=2)[1, :]
+            self.cube['L'][:, 1] = np.rot90(temp_right, k=2)[:, 1]
+            self.cube['R'][:, 1] = np.rot90(temp_left, k=2)[:, 1]
 
     def reverse_moves(self, moves):
         # Split the input string into individual moves
@@ -407,7 +513,9 @@ class RubiksCube:
         return ' '.join(inverted_moves)
 
     def make_alg(self, alg_name, alg="", move_count=1):
-        permutation = {k: v for (k, v) in enumerate(perms_all)}
+        permutation = {k: v for (k, v) in enumerate(perms)}
+        permutation_edges = {k: v for (k, v) in enumerate(edge_perms)}
+        permutation_corners = {k: v for (k, v) in enumerate(corner_perms)}
         if alg != "":
             moves = alg.split(" ")
             for i in range(len(moves)):
@@ -433,7 +541,28 @@ class RubiksCube:
                 # print(f"randomkey {random_key}")
 
                 self.move_history.append(str(random_key))
+        if alg_name == "random_algs_edges":
+            for j in range(int(move_count)):
+                random_key = random.choice(list(permutation_edges.keys()))
+                random_value = permutation_edges[random_key]
+                moves = random_value.split(" ")
+                for i in range(len(moves)):
+                    self.rotate_face(moves[i])
+                # print(str(random_key))
+                # print(f"randomkey {random_key}")
 
+                self.move_history.append(str(random_key)+"_Edges")
+        if alg_name == "random_algs_corners":
+            for j in range(int(move_count)):
+                random_key = random.choice(list(permutation_corners.keys()))
+                random_value = permutation_corners[random_key]
+                moves = random_value.split(" ")
+                for i in range(len(moves)):
+                    self.rotate_face(moves[i])
+                # print(str(random_key))
+                # print(f"randomkey {random_key}")
+
+                self.move_history.append(str(random_key)+"_Corners")
         if alg_name == "random_moves_algs_moves_prim":
             for j in range(int(move_count)):
                 random_moves_str = " ".join([random.choice(list(viable_moves)) for _ in range(random.randint(0, 7))])
@@ -463,7 +592,64 @@ class RubiksCube:
                     for i in range(len(moves)):
                         self.rotate_face(moves[i])
                     self.move_history.append(str(random_key))
+        if alg_name == "random_moves_algs_moves_prim_edges":
+            for j in range(int(move_count)):
+                random_moves_str = " ".join([random.choice(list(viable_moves)) for _ in range(random.randint(0, 7))])
+                random_moves = random_moves_str.split(" ")
+                if random_moves[0] != "":
+                    reverse_random_moves = (self.reverse_moves(random_moves_str)).split(" ")
+                    for i in range(len(random_moves)):
+                        self.rotate_face(random_moves[i])
+                        self.move_history.append(random_moves[i])
 
+                    random_key = random.choice(list(permutation_edges.keys()))
+                    random_value = permutation_edges[random_key]
+                    moves = random_value.split(" ")
+
+                    for i in range(len(moves)):
+                        self.rotate_face(moves[i])
+                    self.move_history.append(str(random_key)+"_Edges")
+
+                    for i in range(len(reverse_random_moves)):
+                        self.rotate_face(reverse_random_moves[i])
+                        self.move_history.append(reverse_random_moves[i])
+                else:
+                    random_key = random.choice(list(permutation_edges.keys()))
+                    random_value = permutation_edges[random_key]
+                    moves = random_value.split(" ")
+
+                    for i in range(len(moves)):
+                        self.rotate_face(moves[i])
+                    self.move_history.append(str(random_key)+"_Edges")
+        if alg_name == "random_moves_algs_moves_prim_corners":
+            for j in range(int(move_count)):
+                random_moves_str = " ".join([random.choice(list(viable_moves)) for _ in range(random.randint(0, 7))])
+                random_moves = random_moves_str.split(" ")
+                if random_moves[0] != "":
+                    reverse_random_moves = (self.reverse_moves(random_moves_str)).split(" ")
+                    for i in range(len(random_moves)):
+                        self.rotate_face(random_moves[i])
+                        self.move_history.append(random_moves[i])
+
+                    random_key = random.choice(list(permutation_corners.keys()))
+                    random_value = permutation_corners[random_key]
+                    moves = random_value.split(" ")
+
+                    for i in range(len(moves)):
+                        self.rotate_face(moves[i])
+                    self.move_history.append(str(random_key)+"_Corners")
+
+                    for i in range(len(reverse_random_moves)):
+                        self.rotate_face(reverse_random_moves[i])
+                        self.move_history.append(reverse_random_moves[i])
+                else:
+                    random_key = random.choice(list(permutation_corners.keys()))
+                    random_value = permutation_corners[random_key]
+                    moves = random_value.split(" ")
+
+                    for i in range(len(moves)):
+                        self.rotate_face(moves[i])
+                    self.move_history.append(str(random_key)+"_Corners")
         if alg_name == "random_moves":
             for j in range(int(move_count)):
                 random_move = random.choice(list(viable_moves))
@@ -479,7 +665,6 @@ class RubiksCube:
 
         if alg_name == "scramble":
             moves = self.scramble.split(" ")
-            print(moves)
             for i in range(len(moves)):
                 self.rotate_face(moves[i])
 
@@ -495,6 +680,8 @@ class RubiksCube:
 
     def get_score(self):
         score = 0
+        edge_score = 0
+        corner_score = 0
         for face in self.cube:
             center = self.cube[face][1, 1]
             # for row in self.cube[face]:
@@ -508,6 +695,7 @@ class RubiksCube:
                 if (self.cube[face][edge_coords_1[0]][edge_coords_1[1]] != center or
                         self.cube[adjacent_face][edge_coords_2[0]][edge_coords_2[1]] != self.cube[adjacent_face][1][1]):
                     score += 1
+                    edge_score += 1
             for adjacent_face_1, adjacent_face_2, edge_coords_1, edge_coords_2, edge_coords_3 in adjacent_corners:
                 if (self.cube[face][edge_coords_1[0]][edge_coords_1[1]] != center or
                         self.cube[adjacent_face_1][edge_coords_2[0]][edge_coords_2[1]] !=
@@ -515,7 +703,8 @@ class RubiksCube:
                         self.cube[adjacent_face_2][edge_coords_3[0]][edge_coords_3[1]] !=
                         self.cube[adjacent_face_2][1][1]):
                     score += 1
-        return score
+                    corner_score += 1
+        return score, edge_score, corner_score
 
     def display(self):
         blank_face = np.full((3, 3), ' ')
