@@ -315,11 +315,9 @@ class Drawer:
         i = 0
         j = -500
         current_move_index = 0
-        delay_solving = 10
+        delay_solving = 1
         while not glfw.window_should_close(window):
             if len(self.solution) > 0:
-
-
                 if j == 0:
                     self.cube.reset_state()
                     self.cube.make_alg("scramble")
@@ -328,7 +326,7 @@ class Drawer:
                     if i % delay_solving == 0:
                         self.cube.rotate_face(self.solution[current_move_index])
                         current_move_index += 1
-                    if i > delay_solving*(len(self.solution)-1):
+                    if current_move_index >= len(self.solution):
                         i = 0
                         j = -500
                         current_move_index = 0
