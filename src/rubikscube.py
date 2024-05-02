@@ -103,7 +103,6 @@ class RubiksCube:
             self.cube['R'][:, 0] = temp_bottom[::-1]
         elif face == "F2":
             self.cube["F"] = np.rot90(self.cube["F"], k=2)
-            # Temporarily store the edges
             temp_top = np.copy(self.cube['U'][2, :])
             temp_bottom = np.copy(self.cube['D'][0, :])
             temp_left = np.copy(self.cube['L'][:, 2])
@@ -116,39 +115,33 @@ class RubiksCube:
 
         elif face == "D":
             self.cube["D"] = np.rot90(self.cube["D"], k=-1)
-            # Temporarily store the edges
             temp_front = np.copy(self.cube['F'][2, :])
             temp_left = np.copy(self.cube['L'][2, :])
             temp_back = np.copy(self.cube['B'][2, :])
             temp_right = np.copy(self.cube['R'][2, :])
 
-            # Rotate the edges
             self.cube['B'][2, :] = temp_right
             self.cube['R'][2, :] = temp_front
             self.cube['F'][2, :] = temp_left
             self.cube['L'][2, :] = temp_back
         elif face == "D'":
             self.cube["D"] = np.rot90(self.cube["D"])
-            # Temporarily store the edges
             temp_front = np.copy(self.cube['F'][2, :])
             temp_left = np.copy(self.cube['L'][2, :])
             temp_back = np.copy(self.cube['B'][2, :])
             temp_right = np.copy(self.cube['R'][2, :])
 
-            # Rotate the edges
             self.cube['B'][2, :] = temp_left
             self.cube['R'][2, :] = temp_back
             self.cube['F'][2, :] = temp_right
             self.cube['L'][2, :] = temp_front
         elif face == "D2":
             self.cube["D"] = np.rot90(self.cube["D"], k=2)
-            # Temporarily store the edges
             temp_front = np.copy(self.cube['F'][2, :])
             temp_left = np.copy(self.cube['L'][2, :])
             temp_back = np.copy(self.cube['B'][2, :])
             temp_right = np.copy(self.cube['R'][2, :])
 
-            # Rotate the edges
             self.cube['B'][2, :] = temp_front
             self.cube['R'][2, :] = temp_left
             self.cube['F'][2, :] = temp_back
@@ -286,7 +279,6 @@ class RubiksCube:
             self.cube['B'][0, :] = temp_front
             self.cube['R'][0, :] = temp_left
         elif face == "x":
-            # self.display()
             self.cube["R"] = np.rot90(self.cube["R"], k=-1)
             self.cube["L"] = np.rot90(self.cube["L"])
             temp_front = np.copy(self.cube['F'])
@@ -298,9 +290,7 @@ class RubiksCube:
             self.cube['U'] = temp_front
             self.cube['D'] = np.rot90(temp_back, k=2)
             self.cube['B'] = np.rot90(temp_up, k=2)
-            # self.display()
         elif face == "x'":
-            # self.display()
             self.cube["R"] = np.rot90(self.cube["R"])
             self.cube["L"] = np.rot90(self.cube["L"], k=-1)
             temp_front = np.copy(self.cube['F'])
@@ -324,9 +314,7 @@ class RubiksCube:
             self.cube['U'] = temp_down
             self.cube['D'] = temp_up
             self.cube['B'] = np.rot90(temp_front, k=2)
-            # self.display()
         elif face == "M":
-            # self.display()
             temp_front = np.copy(self.cube['F'])
             temp_up = np.copy(self.cube['U'])
             temp_down = np.copy(self.cube['D'])
@@ -346,7 +334,6 @@ class RubiksCube:
             self.cube['U'][:, 1] = temp_front[:, 1]
             self.cube['D'][:, 1] = np.rot90(temp_back, k=2)[:, 1]
             self.cube['B'][:, 1] = np.rot90(temp_up, k=2)[:, 1]
-            # self.display()
         elif face == "M2":
             temp_front = np.copy(self.cube['F'])
             temp_up = np.copy(self.cube['U'])
@@ -450,7 +437,6 @@ class RubiksCube:
         elif face == "z2":
             self.cube["F"] = np.rot90(self.cube["F"], k=2)
             self.cube["B"] = np.rot90(self.cube["B"], k=2)
-            # Temporarily store the edges
             temp_top = np.copy(self.cube['U'])
             temp_bottom = np.copy(self.cube['D'])
             temp_left = np.copy(self.cube['L'])
@@ -481,7 +467,6 @@ class RubiksCube:
             self.cube['L'][:, 1] = np.rot90(temp_top)[:, 1]
             self.cube['R'][:, 1] = np.rot90(temp_bottom)[:, 1]
         elif face == "S2":
-            # Temporarily store the edges
             temp_top = np.copy(self.cube['U'])
             temp_bottom = np.copy(self.cube['D'])
             temp_left = np.copy(self.cube['L'])
@@ -493,23 +478,20 @@ class RubiksCube:
             self.cube['R'][:, 1] = np.rot90(temp_left, k=2)[:, 1]
 
     def reverse_moves(self, moves):
-        # Split the input string into individual moves
         move_list = moves.strip().split()
 
-        # Reverse the order of moves
+
         reversed_moves = move_list[::-1]
 
-        # Invert each move
+
         inverted_moves = []
         for move in reversed_moves:
             if "'" in move:
                 inverted_moves.append(move.replace("'", ""))
             elif "2" in move:
-                inverted_moves.append(move)  # 180-degree rotations are self-inverse
+                inverted_moves.append(move)
             else:
                 inverted_moves.append(move + "'")
-
-        # Join the inverted moves back into a string
         return ' '.join(inverted_moves)
 
     def make_alg(self, alg_name, alg="", move_count=1):
@@ -537,8 +519,6 @@ class RubiksCube:
                 moves = random_value.split(" ")
                 for i in range(len(moves)):
                     self.rotate_face(moves[i])
-                # print(str(random_key))
-                # print(f"randomkey {random_key}")
 
                 self.move_history.append(str(random_key))
         if alg_name == "random_algs_edges":
@@ -548,8 +528,6 @@ class RubiksCube:
                 moves = random_value.split(" ")
                 for i in range(len(moves)):
                     self.rotate_face(moves[i])
-                # print(str(random_key))
-                # print(f"randomkey {random_key}")
 
                 self.move_history.append(str(random_key)+"_Edges")
         if alg_name == "random_algs_corners":
@@ -559,8 +537,6 @@ class RubiksCube:
                 moves = random_value.split(" ")
                 for i in range(len(moves)):
                     self.rotate_face(moves[i])
-                # print(str(random_key))
-                # print(f"randomkey {random_key}")
 
                 self.move_history.append(str(random_key)+"_Corners")
         if alg_name == "random_moves_algs_moves_prim":

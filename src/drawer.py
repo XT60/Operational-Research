@@ -1,12 +1,13 @@
+import random
+
 import glfw
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
-from .permutation_table import translate_moves
+from .permutation_table import translate_moves, viable_moves
 from .rubikscube import RubiksCube
 from .solver import BeesAlgorithm
 import threading
-
 
 
 class Drawer:
@@ -58,8 +59,8 @@ class Drawer:
             glTranslatef(-x, -y, -z)
 
         glBegin(GL_QUADS)
-        specular = [1.0, 1.0, 1.0, 1.0]  # White specular highlight
-        shininess = [50.0]  # High shininess for a more reflective surface
+        specular = [1.0, 1.0, 1.0, 1.0]
+        shininess = [50.0]
         glMaterialfv(GL_FRONT, GL_SPECULAR, specular)
         glMaterialfv(GL_FRONT, GL_SHININESS, shininess)
         for i, row in enumerate(face):
@@ -214,19 +215,17 @@ class Drawer:
         glPopMatrix()
 
     def window_resize_callback(self, window, width, height):
-        # Update the viewport to match the new window dimensions
         glViewport(0, 0, width, height)
-        # Update the projection matrix
         glMatrixMode(GL_PROJECTION)
         glLoadIdentity()
-        # Adjust the perspective to maintain aspect ratio
         aspect_ratio = width / float(height) if height else 1.0
         gluPerspective(45, aspect_ratio, 0.1, 50.0)
         glMatrixMode(GL_MODELVIEW)
 
     def run_solver(self, solver, i, solved_cube, lock, stop_event, solution):
         print(f"________________________\nIteration: {0}")
-        print(f"\nScore: {solved_cube.get_score()[0]}\nScore_corners: {solved_cube.get_score()[2]}\nScore_edges: {solved_cube.get_score()[1]}\n________________________\n\n")
+        print(
+            f"\nScore: {solved_cube.get_score()[0]}\nScore_corners: {solved_cube.get_score()[2]}\nScore_edges: {solved_cube.get_score()[1]}\n________________________\n\n")
         is_solved = False
         while not stop_event.is_set() and not is_solved:
             if i != 0:
@@ -236,7 +235,8 @@ class Drawer:
             with lock:
                 self.solution = solution
                 solved_cube.update(new_cube)
-            print(f"\nScore: {solved_cube.get_score()[0]}\nScore_corners: {solved_cube.get_score()[2]}\nScore_edges: {solved_cube.get_score()[1]}\n________________________\n\n")
+            print(
+                f"\nScore: {solved_cube.get_score()[0]}\nScore_corners: {solved_cube.get_score()[2]}\nScore_edges: {solved_cube.get_score()[1]}\n________________________\n\n")
             if len(solution) == 1 and solution[0] == "Above Limit":
                 break
             i += 1
@@ -264,12 +264,10 @@ class Drawer:
         glEnable(GL_LIGHTING)
         glEnable(GL_LIGHT0)
 
-
         glEnable(GL_COLOR_MATERIAL)
-        light_position = [0, 1, 2, 0]  # Directional light
+        light_position = [0, 1, 2, 0]
         glLightfv(GL_LIGHT0, GL_POSITION, light_position)
 
-        # Setting ambient, diffuse and specular lighting
         ambient_light = [0.2, 0.2, 0.2, 1.0]
         diffuse_light = [0.7, 0.7, 0.7, 1.0]
         specular_light = [0.9, 0.9, 0.9, 1.0]
@@ -281,7 +279,7 @@ class Drawer:
 
         glEnable(GL_DEPTH_TEST)
         glEnable(GL_MULTISAMPLE)
-        glDepthFunc(GL_LESS)  # Specify depth-testing interpret
+        glDepthFunc(GL_LESS)
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)
         glMatrixMode(GL_PROJECTION)
@@ -292,30 +290,28 @@ class Drawer:
         glfw.set_key_callback(window, self.key_callback)
         glfw.set_scroll_callback(window, self.scroll_callback)
         return window
+
     def run(self):
         window = self.init_gl()
-        i = 1
-        current_move_index = 0
-        temp_alg = "F L F U' R U F2 L2 U' L' B D' B' L2 U"
-        temp_alg = "U' F2 R' L' U' B R2 D B U' R2 L B2 D' B2 U F2 B2 U' L2 B2 L2"
-        moves = temp_alg.split(" ")
-        moves = []
+
         self.cube = RubiksCube("B' D2 L' F' B2 U2 D F2 R' U' D2 L2 F L2 B F2 R D L D' F2 L2 B' L' R'")
-        # self.cube = RubiksCube("")
-        print(f"________________________________________________\nSolving a Rubik's Cube scrambled with \n\n{self.cube.get_scramble()}\n\n________________________________________________\n\n\n")
-        # self.cube = RubiksCube()
+        # self.cube = RubiksCube(" ".join(random.choices(viable_moves, k=50)))
+
+        print(
+            f"________________________________________________\nSolving a Rubik's Cube scrambled with \n\n{self.cube.get_scramble()}\n\n________________________________________________\n\n\n")
 
         solver = BeesAlgorithm(self.cube, 300, 300, 50, 200)
 
         lock = threading.Lock()
         stop_event = threading.Event()
-        solver_thread = threading.Thread(target=self.run_solver, args=(solver, 1, self.cube, lock, stop_event, self.solution))
+        solver_thread = threading.Thread(target=self.run_solver,
+                                         args=(solver, 1, self.cube, lock, stop_event, self.solution))
         solver_thread.start()
 
         i = 0
         j = -500
         current_move_index = 0
-        delay_solving = 1
+        delay_solving = 10
         while not glfw.window_should_close(window):
             if len(self.solution) > 0:
                 if j == 0:
@@ -331,16 +327,6 @@ class Drawer:
                         j = -500
                         current_move_index = 0
                 j += 1
-            # if i % 100 == 0 and (current_move_index < len(moves) or 1):
-            #     # self.cube.rotate_face(moves[current_move_index])
-            #     # current_move_index += 1
-            #     self.cube.make_alg("random_scramble")
-            # if i % 10 == 0 and (current_move_index < len(moves) or 1):
-            #     # self.cube.rotate_face(moves[current_move_index])
-            #     # current_move_index += 1
-            #     solved_cube = solver.solve(i//10).copy()
-            #     print(solved_cube.get_score()[0])
-            # i += 1
             with lock:
                 current_cube = self.cube.copy()
             self.draw_cube(current_cube)

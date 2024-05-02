@@ -106,3 +106,5 @@ def translate_moves(move_history):
             translated_moves.append(move)  # Directly append the move if no translation is needed
 
     return " ".join(translated_moves).split(" ")
+
+
