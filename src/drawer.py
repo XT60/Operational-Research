@@ -294,8 +294,8 @@ class Drawer:
     def run(self):
         window = self.init_gl()
 
-        self.cube = RubiksCube("B' D2 L' F' B2 U2 D F2 R' U' D2 L2 F L2 B F2 R D L D' F2 L2 B' L' R'")
-        # self.cube = RubiksCube(" ".join(random.choices(viable_moves, k=50)))
+        # self.cube = RubiksCube("B' D2 L' F' B2 U2 D F2 R' U' D2 L2 F L2 B F2 R D L D' F2 L2 B' L' R'")
+        self.cube = RubiksCube(" ".join(random.choices(viable_moves, k=50)))
 
         print(
             f"________________________________________________\nSolving a Rubik's Cube scrambled with \n\n{self.cube.get_scramble()}\n\n________________________________________________\n\n\n")
