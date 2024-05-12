@@ -300,7 +300,7 @@ class Drawer:
         print(
             f"________________________________________________\nSolving a Rubik's Cube scrambled with \n\n{self.cube.get_scramble()}\n\n________________________________________________\n\n\n")
 
-        solver = BeesAlgorithm(self.cube, 300, 300, 50, 200)
+        solver = BeesAlgorithm(self.cube, 50, 50, 50, 50)
 
         lock = threading.Lock()
         stop_event = threading.Event()
