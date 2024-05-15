@@ -1,0 +1,16 @@
+{
+    "mode": "solver+visualizer",
+    "scramble_moves_count": 50,
+    "manual_scramble": "",
+    "solver_settings": {
+        "initial_population_size": 50,
+        "num_scouts": 50,
+        "num_local_searches": 50,
+        "max_iterations": 50,
+        "save_solution": true
+    },
+    "drawer_settings": {
+        "initial_delay": 500,
+        "delay_solving": 10
+    }
+}

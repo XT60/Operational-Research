@@ -11,13 +11,22 @@ import threading
 
 
 class Drawer:
-    def __init__(self):
+    def __init__(self, cube=None):
         self.last_mouse_pos = (0, 0)
         self.scene_rotation = [0, 0]
         self.mouse_pressed = False
-        self.cube = RubiksCube()
+        if cube:
+            self.cube = cube
+        else:
+            self.cube = RubiksCube()
         self.scene_scale = 1.0
         self.solution = []
+        self.delay_solving = 500
+        self.delay_between_moves = 10
+
+    def set_delays(self, delay_solving, delay_between_moves):
+        self.delay_solving = delay_solving
+        self.delay_between_moves = delay_between_moves
 
     def draw_cube_face(self, face, face_name):
         x, y, z = 0, 0, 0
@@ -222,32 +231,6 @@ class Drawer:
         gluPerspective(45, aspect_ratio, 0.1, 50.0)
         glMatrixMode(GL_MODELVIEW)
 
-    def run_solver(self, solver, i, solved_cube, lock, stop_event, solution):
-        print(f"________________________\nIteration: {0}")
-        print(
-            f"\nScore: {solved_cube.get_score()[0]}\nScore_corners: {solved_cube.get_score()[2]}\nScore_edges: {solved_cube.get_score()[1]}\n________________________\n\n")
-        is_solved = False
-        while not stop_event.is_set() and not is_solved:
-            if i != 0:
-                print(f"________________________\nIteration: {i}")
-            is_solved, new_cube, solution = solver.solve(i)
-            new_cube = new_cube.copy()
-            with lock:
-                self.solution = solution
-                solved_cube.update(new_cube)
-            print(
-                f"\nScore: {solved_cube.get_score()[0]}\nScore_corners: {solved_cube.get_score()[2]}\nScore_edges: {solved_cube.get_score()[1]}\n________________________\n\n")
-            if len(solution) == 1 and solution[0] == "Above Limit":
-                break
-            i += 1
-        a = " ".join(translate_moves(self.cube.move_history))
-        if is_solved:
-            print(
-                f"\n\n\n________________________________________________\n\nSolved the Rubik's Cube!\n\nFound Solution:\n\n{a}\n\n________________________________________________\n\n")
-        else:
-            self.solution = []
-            print("Above Limit, Aborting")
-
     def init_gl(self):
         if not glfw.init():
             return
@@ -263,9 +246,9 @@ class Drawer:
 
         glEnable(GL_LIGHTING)
         glEnable(GL_LIGHT0)
-
+        glEnable(GL_NORMALIZE)
         glEnable(GL_COLOR_MATERIAL)
-        light_position = [0, 1, 2, 0]
+        light_position = [1, 3, 3, 0]
         glLightfv(GL_LIGHT0, GL_POSITION, light_position)
 
         ambient_light = [0.2, 0.2, 0.2, 1.0]
@@ -291,45 +274,54 @@ class Drawer:
         glfw.set_scroll_callback(window, self.scroll_callback)
         return window
 
-    def run(self):
+    def update_cube(self, solution, new_cube):
+        self.solution = solution
+        self.cube.update(new_cube)
+
+    def run(self, stop_event):
+        """
+        Drives the graphical representation of the Rubik's Cube solving process using OpenGL, rendering the cube's state continuously and applying moves sequentially.
+
+        This method initializes a window using OpenGL and continually renders the Rubik's Cube's state until the window is closed or the solving process is complete. It displays the initial scramble and handles the application of each move in the solution sequence with a delay to visualize the solving process step by step.
+
+        Args:
+            stop_event (threading.Event): An event used to signal the termination of the thread running this method, ensuring proper shutdown and resource release.
+
+        Workflow:
+            1. Initialize the OpenGL window and print the scramble.
+            2. Continuously render the cube's state in the window while it remains open.
+            3. Sequentially apply moves from the solution list to the cube with a fixed delay between moves, allowing visualization of each step.
+            4. If the cube is solved and the solution is non-empty, reset and re-scramble the cube after showing the full solution to restart the solving visualization.
+            5. Terminate the OpenGL context and set the stop event upon closing the window to signal that the rendering thread has finished.
+
+        This method effectively simulates a real-time solving environment for a Rubik's Cube, making it useful for demonstrations or interactive visualizations where users can watch the cube being solved in a controlled graphical setting.
+        """
         window = self.init_gl()
-
-        # self.cube = RubiksCube("B' D2 L' F' B2 U2 D F2 R' U' D2 L2 F L2 B F2 R D L D' F2 L2 B' L' R'")
-        self.cube = RubiksCube(" ".join(random.choices(viable_moves, k=50)))
-
         print(
-            f"________________________________________________\nSolving a Rubik's Cube scrambled with \n\n{self.cube.get_scramble()}\n\n________________________________________________\n\n\n")
-
-        solver = BeesAlgorithm(self.cube, 50, 50, 50, 50)
-
-        lock = threading.Lock()
-        stop_event = threading.Event()
-        solver_thread = threading.Thread(target=self.run_solver,
-                                         args=(solver, 1, self.cube, lock, stop_event, self.solution))
-        solver_thread.start()
+            f"________________________________________________\nSolving a Rubik's Cube scrambled with"
+            f" \n\n{self.cube.get_scramble()}\n\n________________________________________________\n\n\n")
 
         i = 0
-        j = -500
+        j = -self.delay_solving
         current_move_index = 0
-        delay_solving = 10
+
         while not glfw.window_should_close(window):
-            if len(self.solution) > 0:
-                if j == 0:
-                    self.cube.reset_state()
-                    self.cube.make_alg("scramble")
-                if j > 500:
-                    i += 1
-                    if i % delay_solving == 0:
-                        self.cube.rotate_face(self.solution[current_move_index])
-                        current_move_index += 1
-                    if current_move_index >= len(self.solution):
-                        i = 0
-                        j = -500
-                        current_move_index = 0
-                j += 1
-            with lock:
-                current_cube = self.cube.copy()
-            self.draw_cube(current_cube)
+            if self.cube.solved:
+                if len(self.solution) > 0:
+                    if j == 0:
+                        self.cube.reset_state()
+                        self.cube.make_alg("scramble")
+                    if j > 500:
+                        i += 1
+                        if i % self.delay_between_moves == 0:
+                            self.cube.rotate_face(self.solution[current_move_index])
+                            current_move_index += 1
+                        if current_move_index >= len(self.solution):
+                            i = 0
+                            j = -self.delay_solving
+                            current_move_index = 0
+                    j += 1
+            self.draw_cube(self.cube)
             glfw.swap_buffers(window)
             glfw.poll_events()
         glfw.terminate()
