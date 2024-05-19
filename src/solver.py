@@ -1,6 +1,7 @@
 import random
 import time
-
+import csv
+import os
 import tqdm
 from .rubikscube import RubiksCube
 from .permutation_table import translate_moves
@@ -51,6 +52,10 @@ class BeesAlgorithm:
         self.score_threshold = 5
         self.solution = ""
         self.save = False
+
+        self.execution_id = int(time.time())  # Unique ID for each execution based on current time
+        self.init_csv_files()
+
 
     def set_save(self, save):
         """
@@ -212,6 +217,40 @@ class BeesAlgorithm:
                 return True, cube, translate_moves(cube.move_history)
         return False, self.population[0], []
 
+    def init_csv_files(self):
+        # Execution log file
+        if not os.path.exists('execution_log.csv'):
+            with open('execution_log.csv', mode='w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow([
+                    'initial_population_size', 'num_scouts', 'num_local_searches',
+                    'max_iterations', 'execution_id', 'num_iterations', 'execution_time'
+                ])
+
+        # Iteration log file
+        if not os.path.exists('iteration_log.csv'):
+            with open('iteration_log.csv', mode='w', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow([
+                    'initial_population_size', 'num_scouts', 'num_local_searches',
+                    'max_iterations', 'execution_id', 'iteration', 'score', 'corner_score', 'edge_score'
+                ])
+
+    def log_execution(self, num_iterations, execution_time):
+        with open('execution_log.csv', mode='a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([
+                self.initial_population_size, self.num_scouts, self.num_local_searches,
+                self.max_iterations, self.execution_id, num_iterations, execution_time
+            ])
+
+    def log_iteration(self, iteration, score, corner_score, edge_score):
+        with open('iteration_log.csv', mode='a', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow([
+                self.initial_population_size, self.num_scouts, self.num_local_searches,
+                self.max_iterations, self.execution_id, iteration, score, corner_score, edge_score
+            ])
     def run_solver(self, lock, stop_event, callback=None):
         """
         Executes the solving process for the Rubik's Cube in a potentially multithreaded environment. It uses a stop event
@@ -256,7 +295,12 @@ class BeesAlgorithm:
             with lock:
                 if callback:
                     callback(solution, new_cube)
-                    self.solved_cube = new_cube
+                    self.solved_cube = new_cube.copy()
+
+            score = self.solved_cube.get_score()[0]
+            corner_score = self.solved_cube.get_score()[2]
+            edge_score = self.solved_cube.get_score()[1]
+            self.log_iteration(i, score, corner_score, edge_score)
 
             print(
                 f"\nScore: {self.solved_cube.get_score()[0]}\nScore_corners: {self.solved_cube.get_score()[2]}\n"
@@ -266,6 +310,7 @@ class BeesAlgorithm:
         end_time = time.time()
 
         found_solution = " ".join(translate_moves(self.solved_cube.move_history))
+        execution_time = int(end_time - start_time)
 
         if is_solved:
             print(
@@ -294,6 +339,7 @@ class BeesAlgorithm:
             if callback:
                 callback([], self.solved_cube)
             print("Aborted")
+        self.log_execution(i, execution_time)
 
     def solver_thread(self, lock, stop_event, callback=None):
         if callback is not None:
