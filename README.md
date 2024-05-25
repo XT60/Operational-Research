@@ -14,11 +14,8 @@ This project features a Rubik's Cube solver implemented in Python, utilizing Ope
 To run this project, you need Python and the following packages, by running:
 ```bash
 pip install glfw PyOpenGL PyOpenGL_accelerate tqdm numpy
-
 ```
-
 or 
-
 ```bash
 pip install -r requirements.txt
 ```
@@ -29,12 +26,64 @@ Execute the main script to start the application:
 python main.py
 ```
 
+## Configuration
+Before running the application, you can configure various parameters in the `config.json` file located in the source directory.
+
+### Default Configuration:
+If the `config.json` file is not found or is improperly formatted, the application will use the following default settings:
+```json
+{
+  "mode": "both",
+  "scramble_moves_count": 50,
+  "manual_scramble": "",
+  "solver_settings": {
+    "initial_population_size": 50,
+    "num_scouts": 50,
+    "num_local_searches": 50,
+    "max_iterations": 50,
+    "save_solution": true
+  },
+  "drawer_settings": {
+    "initial_delay": 500,
+    "delay_solving": 10
+  }
+}
+```
+
+### Modifying Configuration:
+1. Open the `config.json` file in a text editor.
+2. Adjust the parameters as needed. Below are the descriptions of each parameter:
+
+#### Parameters:
+- **mode**: Determines which components to run. Possible values:
+  - `"both"`: Run both the solver and visualizer.
+  - `"solver"`: Run only the solver.
+  - `"visualizer"`: Run only the visualizer.
+- **scramble_moves_count**: Number of random moves to scramble the Rubik's Cube. Ignored if `manual_scramble` is provided.
+  - Example: `"scramble_moves_count": 30`
+- **manual_scramble**: String of moves to manually scramble the Rubik's Cube. Overrides `scramble_moves_count`.
+  - Example: `"manual_scramble": "U R2 F B R B2 R U2 L B2 R U' D' R2 F R' L B2 U2 F2"`
+- **solver_settings**: Settings for the Bees Algorithm solver:
+  - **initial_population_size**: Initial population size for the solver.
+    - Example: `"initial_population_size": 100`
+  - **num_scouts**: Number of scout bees.
+    - Example: `"num_scouts": 50`
+  - **num_local_searches**: Number of local searches.
+    - Example: `"num_local_searches": 50`
+  - **max_iterations**: Maximum number of iterations for the solver.
+    - Example: `"max_iterations": 200`
+  - **save_solution**: Whether to save the solution (the solution will be saved in the `solutions` folder).
+    - Example: `"save_solution": false`
+- **drawer_settings**: Settings for the visualizer (drawer):
+  - **initial_delay**: Initial delay before starting the visualization in frames.
+    - Example: `"initial_delay": 1000`
+  - **delay_solving**: Delay between each move during solving in frames.
+    - Example: `"delay_solving": 20`
+
+After adjusting the configuration file, you can run the program with:
+```bash
+python main.py
+```
+
 ## License
 This project is open-sourced under the MIT license.
-
-## Author
-[Your Name]
-
----
-
-Feel free to customize any part of this README.md to better fit the specifics of your project or to add additional sections such as "Contributing," "Future Improvements," or "Acknowledgments" as needed.
