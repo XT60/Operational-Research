@@ -85,5 +85,15 @@ After adjusting the configuration file, you can run the program with:
 python main.py
 ```
 
+## Output
+The solution to the Rubik's Cube will be displayed in the console and saved to the solutions folder if save_solution is set to true. The output will include the sequence of moves required to solve the cube and the time taken to find the solution. An example of the output is shown below:
+
+```
+Solution for: L2 E' L' F L' F x' y M R' z2 M S2 F2 x2 y' y' E2 L2 z E' y' z x' B' R R U' R S R F2 x2 S' B2 z2 z' L E' D' E2 E U2 D2 S' L2 B' F B U2
+
+Found in 133 seconds with 28 iterations
+with following parameters: initial_population_size=50 num_scouts=50 num_local_searches=50 max_iterations=50
+```
+
 ## License
 This project is open-sourced under the MIT license.
