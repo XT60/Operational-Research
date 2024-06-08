@@ -295,7 +295,7 @@ class BeesAlgorithm:
             with lock:
                 if callback:
                     callback(solution, new_cube)
-                    self.solved_cube = new_cube.copy()
+                self.solved_cube = new_cube.copy()
 
             score = self.solved_cube.get_score()[0]
             corner_score = self.solved_cube.get_score()[2]
