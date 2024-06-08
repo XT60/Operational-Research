@@ -42,11 +42,11 @@ DEFAULT_CONFIG = {
 
 def objective(params):
     cube = RubiksCube(" ".join(random.choices(viable_moves, k=50)))  # use random scramble for each trial
-    solver = BeesAlgorithm(cube, **params)
+    solver = BeesAlgorithm(cube, max_iterations=200, **params)
     lock = threading.Lock()
     stop_event = threading.Event()
-    metrics = solver.run_solver(lock, stop_event)  # Ensure this method returns metrics like solve time
-    return {'loss': metrics['solve_time'], 'status': STATUS_OK}
+    metric_solve = solver.run_solver(lock, stop_event)  # Ensure this method returns metrics like solve time
+    return {'loss': metric_solve, 'status': STATUS_OK}
 
 def main():
     config = load_config()

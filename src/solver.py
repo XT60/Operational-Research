@@ -340,6 +340,7 @@ class BeesAlgorithm:
                 callback([], self.solved_cube)
             print("Aborted")
         self.log_execution(i, execution_time)
+        return execution_time if is_solved else execution_time * 2
 
     def solver_thread(self, lock, stop_event, callback=None):
         if callback is not None:

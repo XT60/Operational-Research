@@ -3,3 +3,4 @@ PyOpenGL
 PyOpenGL_accelerate
 tqdm
 numpy
+hyperopt

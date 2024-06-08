@@ -1,3 +1,4 @@
 initial_population_size,num_scouts,num_local_searches,max_iterations,execution_id,num_iterations,execution_time
 50,50,50,50,1716159807,32,133
 50,50,50,50,1717865140,19,101
+138,22,43,200,1717872564,60,95
