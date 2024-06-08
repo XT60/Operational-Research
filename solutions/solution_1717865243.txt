@@ -1,0 +1,7 @@
+Solution for: x2 F' M2 L' x' S2 y F' x2 y z B' B2 R2 U S' R' U E2 L x2 U F2 y F' S2 z' B' R2 x M2 U2 y2 F' E y2 F U2 L' x y' R2 D2 E L D2 L R2 E y'
+Found in 101 seconds with 19 iterations
+with following parameters: initial_population_size=50, num_scouts=50, num_local_searches=50, max_iterations=50
+
+
+
+y2 E' E z z2 R2 R' U' R U R' U' R U L R' U' R U R' U' R U L R' U' R U R' U' R U L2 R2 z2 z' E' E y2 S L E E2 R M' S' x' L' U L D' L' U' L D L' U' L D' L' U L D S M R' E2 E' L' S' B x R U R' F' R U R' U' R' F R2 U' R' x' B' x' y2 U y F R U' R' U' R U R' F' R U R' U' R' F R F' y' U' y2 x R U R' F' R U R' U' R' F R2 U' R' E' R U R' U R U R' F' R U R' U' R' F R2 U' R' U2 R U' R' E M' D' R' D R2 R2 E R U' R' U R U' R' U L2 R U' R' U R U' R' U R U' R' U R U' R' U L2 E' R2 R2 D' R D M M D2 S2 R U' R U R U R U' R' U' R2 S2 D2 M' R2 U R U R' U' R' U' R' U R' M' D M2 S D S x R U' R U R U R U' R' U' R2 x' S' D' S' M2 D' M y' B2 y2 B2 F2 R U' R U R U R U' R' U' R2 F2 B2 y2 B2 y x2 M' S2 D' E' L R2 U R U R' U' R' U' R' U R' L' E D S2 M x2 z2 M' R2 D' R2 R2 U R U R' U' R' U' R' U R' R2 D R2 M z2 y2 M2 U' M U2 M' U' M2 y2 S' D2 x' S' R2 U R U R' U' R' U' R' U R' S x D2 S M M2 U M2 U2 M2 U M2 M' M E M2 U' M U2 M' U' M2 E' M' E' U' R2 U R U R' U' R' U' R' U R' U E y2 M' M2 U' M U2 M' U' M2 M y2 M2 U' M U2 M' U' M2 B x S' D D' D2 M R2 U R U R' U' R' U' R' U R' M' D2 D D' S x' B' R U' R U R U R U' R' U' R2
